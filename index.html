@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oracle AI Codex</title>
+  <meta name="description" content="Oracle ERP and Fusion Cloud architecture articles with practical AI use cases, implementation patterns, and developer-focused examples." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a31;
+      --panel-2: #17213f;
+      --text: #edf2ff;
+      --muted: #b9c3e6;
+      --accent: #8ab4ff;
+      --accent-2: #5eead4;
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 16px 50px rgba(0,0,0,0.28);
+      --radius: 22px;
+      --max: 1120px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(94,234,212,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(138,180,255,0.16), transparent 30%),
+        linear-gradient(180deg, #09101d 0%, #0f1730 45%, #0c1325 100%);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 30;
+      backdrop-filter: blur(14px);
+      background: rgba(8, 12, 24, 0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0;
+    }
+    .brand { font-weight: 800; letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 12px; flex-wrap: wrap; }
+    .nav-links a {
+      padding: 10px 14px; border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px; color: var(--muted); font-size: 0.95rem;
+      background: rgba(255,255,255,0.03);
+    }
+    .nav-links a:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+    .hero { padding: 72px 0 32px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: 999px;
+      background: rgba(138,180,255,0.12); color: #d9e6ff;
+      border: 1px solid rgba(138,180,255,0.24); font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(2.3rem, 6vw, 4.6rem);
+      line-height: 1.04; margin: 0 0 16px;
+      letter-spacing: -0.04em;
+      max-width: 900px;
+    }
+    .lead {
+      margin: 0; max-width: 860px; color: var(--muted);
+      font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+    }
+    .actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 20px; border-radius: 14px; font-weight: 700;
+      border: 1px solid transparent; transition: transform .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(135deg, var(--accent), #6f90ff); color: #07111e; }
+    .btn.secondary {
+      background: rgba(255,255,255,0.04); color: var(--text);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .grid {
+      display: grid; grid-template-columns: repeat(12, 1fr);
+      gap: 22px; margin: 34px 0 56px;
+    }
+    .card {
+      grid-column: span 6;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .card h2 { margin: 0 0 8px; font-size: 1.7rem; line-height: 1.15; }
+    .card p { margin: 0 0 16px; color: var(--muted); }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+    .pill {
+      padding: 8px 12px; border-radius: 999px; font-size: .9rem;
+      color: #dfe7ff; border: 1px solid rgba(255,255,255,0.11);
+      background: rgba(255,255,255,0.04);
+    }
+    ul { margin: 16px 0 22px 18px; color: var(--muted); }
+    li + li { margin-top: 8px; }
+    .section { padding: 8px 0 34px; }
+    .section h3 { font-size: 1.6rem; margin-bottom: 10px; }
+    .two-col {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px;
+    }
+    .panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px;
+    }
+    .panel p { color: var(--muted); margin-top: 0; }
+    .steps { counter-reset: step; display: grid; gap: 14px; }
+    .step {
+      position: relative; padding: 16px 16px 16px 56px; border-radius: 16px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+    }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; left: 16px; top: 16px;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: grid; place-items: center; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07111e;
+    }
+    footer {
+      padding: 34px 0 56px; color: var(--muted); font-size: 0.95rem;
+    }
+    .small { font-size: 0.95rem; color: var(--muted); }
+    @media (max-width: 900px) {
+      .card { grid-column: span 12; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: min(var(--max), calc(100% - 20px)); }
+      .hero { padding-top: 46px; }
+      .card, .panel { padding: 20px; }
+      .nav { align-items: flex-start; flex-direction: column; }
+      .nav-links { width: 100%; }
+      .nav-links a { flex: 1 1 auto; text-align: center; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand">Oracle AI Codex</div>
+      <nav class="nav-links">
+        <a href="#articles">Articles</a>
+        <a href="#publish">GitHub Pages</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <div class="eyebrow">Oracle ERP • Fusion Cloud • AI-assisted delivery</div>
+      <h1>Oracle architecture articles that move from concept to execution.</h1>
+      <p class="lead">This site publishes practical guidance on how Oracle teams can make AI useful in real delivery work — from the core Oracle AI Codex idea to detailed implementation patterns with measurable outcomes.</p>
+      <div class="actions">
+        <a class="btn primary" href="#articles">Read the articles</a>
+        <a class="btn secondary" href="#publish">Publish updates on GitHub Pages</a>
+      </div>
+    </section>
+
+    <section id="articles" class="wrap section">
+      <div class="grid">
+        <article class="card">
+          <div class="small">Part 1</div>
+          <h2>The Oracle AI Codex: Introduction</h2>
+          <p>A conceptual foundation for making AI useful in Oracle engineering. This article explains why generic AI output often underperforms in Oracle projects, why EBS and Fusion Cloud need different context, and how a structured repository improves delivery quality.</p>
+          <div class="meta">
+            <span class="pill">Conceptual framework</span>
+            <span class="pill">EBS vs Fusion Cloud</span>
+            <span class="pill">Context strategy</span>
+          </div>
+          <ul>
+            <li>Defines the Oracle AI Codex in practical terms</li>
+            <li>Explains the platform-specific context problem</li>
+            <li>Shows what should go into a structured project repository</li>
+            <li>Helps teams start with one active workstream</li>
+          </ul>
+          <a class="btn primary" href="oracle-ai-codex-introduction.html">Open Part 1</a>
+        </article>
+
+        <article class="card">
+          <div class="small">Part 2</div>
+          <h2>The Oracle AI Codex: Execution Patterns</h2>
+          <p>A practitioner-oriented article that turns the framework into real Oracle delivery examples. It covers execution patterns for conversions, integrations, HDL, labor distribution, reporting, and developer usage with measurable outcomes.</p>
+          <div class="meta">
+            <span class="pill">Real-world examples</span>
+            <span class="pill">Developer execution</span>
+            <span class="pill">Measured outcomes</span>
+          </div>
+          <ul>
+            <li>Walks through realistic Oracle implementation scenarios</li>
+            <li>Shows how developers can apply AI in actual delivery work</li>
+            <li>Connects prompts, artifacts, execution steps, and outcomes</li>
+            <li>Makes the concept credible for architects and delivery leads</li>
+          </ul>
+          <a class="btn primary" href="oracle-ai-codex-execution-patterns.html">Open Part 2</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="publish" class="wrap section">
+      <div class="two-col">
+        <div class="panel">
+          <h3>Recommended GitHub Pages structure</h3>
+          <p>Use one repository and keep the file names clean, stable, and URL-friendly.</p>
+          <div class="meta">
+            <span class="pill">Repository: oracle-ai-codex</span>
+            <span class="pill">Public repo</span>
+            <span class="pill">GitHub Pages</span>
+          </div>
+          <pre style="margin:0; white-space:pre-wrap; color:#edf2ff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;">oracle-ai-codex/
+  index.html
+  oracle-ai-codex-introduction.html
+  oracle-ai-codex-execution-patterns.html
+  README.md</pre>
+        </div>
+        <div class="panel">
+          <h3>What to upload</h3>
+          <p>Rename and upload these files into the repository root so the site works immediately on GitHub Pages.</p>
+          <ul>
+            <li><strong>index.html</strong> — homepage that links to both articles</li>
+            <li><strong>oracle-ai-codex-introduction.html</strong> — Part 1</li>
+            <li><strong>oracle-ai-codex-execution-patterns.html</strong> — Part 2</li>
+            <li><strong>README.md</strong> — optional repo overview</li>
+          </ul>
+        </div>
+      </div>
+      <div style="height:18px"></div>
+      <div class="steps">
+        <div class="step"><strong>Create a public repository</strong> using a clean name such as <code>oracle-ai-codex</code>.</div>
+        <div class="step"><strong>Upload these three HTML files</strong> to the repository root.</div>
+        <div class="step"><strong>Go to Settings → Pages</strong> and choose <code>Deploy from a branch</code>, then select <code>main</code> and <code>/(root)</code>.</div>
+        <div class="step"><strong>Open the published URL</strong> and confirm that the homepage links correctly to both article pages.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    Oracle ERP and Fusion Cloud architecture articles with practical AI use cases, implementation patterns, and developer-focused examples.
+  </footer>
+</body>
+</html>
