@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080B14">
+  <title>Oracle AI Codex — Part 3: OpenClaw Explained for Oracle Teams</title>
+  <style>
+    :root {
+      --void: #080B14;
+      --deep: #0D1220;
+      --surface: #131929;
+      --surface-2: #171f33;
+      --border: #24314d;
+      --text: #d8e5f6;
+      --text-mid: #9bb0ca;
+      --text-dim: #7287a5;
+      --bright: #f4f8ff;
+      --gold: #d6ac52;
+      --oracle: #c95a43;
+      --cyan: #4ec9cf;
+      --blue: #5d8fff;
+      --green: #3db87a;
+      --purple: #8b74e0;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 22px;
+      --content: 1120px;
+      --reading: 800px;
+      --header: 74px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(201,90,67,.10), transparent 0 30%),
+        radial-gradient(circle at 85% 20%, rgba(93,143,255,.10), transparent 0 26%),
+        radial-gradient(circle at 50% 100%, rgba(78,201,207,.06), transparent 0 32%),
+        var(--void);
+      color: var(--text);
+      line-height: 1.72;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    /* ── PROGRESS BAR ── */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 80;
+      background: rgba(255,255,255,.04);
+    }
+    .progress span {
+      display: block; height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--oracle), var(--gold), var(--cyan));
+      box-shadow: 0 0 22px rgba(214,172,82,.45);
+    }
+
+    /* ── NAV ── */
+    .site-header {
+      position: sticky; top: 0; z-index: 70;
+      backdrop-filter: blur(14px);
+      background: rgba(8,11,20,.78);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .nav {
+      max-width: calc(var(--content) + 40px);
+      min-height: var(--header);
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto;
+      display: grid; place-items: center; font-weight: 800; color: var(--gold);
+      background: linear-gradient(135deg, rgba(201,90,67,.17), rgba(214,172,82,.12));
+      border: 1px solid rgba(214,172,82,.22);
+      font-size: 1.1rem;
+    }
+    .brand-copy { min-width: 0; }
+    .brand-title { font-size: 14px; font-weight: 760; letter-spacing: .02em; color: var(--bright); }
+    .brand-sub { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .desktop-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .desktop-nav a {
+      font-size: 13px; color: var(--text-mid); padding: 10px 12px; border-radius: 999px; transition: .2s ease;
+    }
+    .desktop-nav a:hover, .desktop-nav a.active {
+      color: var(--bright); background: rgba(255,255,255,.06);
+    }
+    .menu-btn {
+      display: none; background: rgba(255,255,255,.05); color: var(--bright);
+      border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 10px 12px;
+      font-size: 14px; cursor: pointer;
+    }
+    .mobile-nav { display: none; border-top: 1px solid rgba(255,255,255,.06); background: rgba(11,16,29,.96); }
+    .mobile-nav.open { display: block; }
+    .mobile-nav-inner {
+      max-width: calc(var(--content) + 40px); margin: 0 auto; padding: 8px 20px 18px;
+      display: grid; gap: 8px;
+    }
+    .mobile-nav a { color: var(--text-mid); background: rgba(255,255,255,.03); border-radius: 14px; padding: 12px 14px; display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      padding: clamp(44px,7vw,88px) 20px 30px;
+    }
+    .hero-inner {
+      max-width: var(--content); margin: 0 auto;
+      display: grid; grid-template-columns: minmax(0,1.25fr) minmax(300px,.75fr); gap: 24px;
+      align-items: stretch;
+    }
+    .hero-main {
+      background: rgba(19,25,41,.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: clamp(28px,4vw,46px);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; opacity: .7; }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+      animation: pulse 2s ease-in-out infinite; display: inline-block;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.7rem,7vw,5.2rem);
+      line-height: .96; letter-spacing: -.05em;
+      max-width: 12ch;
+      color: var(--bright);
+    }
+    .accent { color: var(--oracle); }
+    .hero-sub {
+      max-width: 58ch; margin: 22px 0 0; color: var(--text-mid);
+      font-size: clamp(1rem,1.9vw,1.16rem);
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .tag {
+      font-size: 12px; padding: 7px 11px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08); color: var(--text-mid); background: rgba(255,255,255,.04);
+    }
+    .tag.red   { color: #ea8d79; border-color: rgba(201,90,67,.24);  background: rgba(201,90,67,.10); }
+    .tag.gold  { color: var(--gold); border-color: rgba(214,172,82,.24); background: rgba(214,172,82,.10); }
+    .tag.blue  { color: #8db1ff; border-color: rgba(93,143,255,.24);  background: rgba(93,143,255,.10); }
+    .tag.cyan  { color: var(--cyan); border-color: rgba(78,201,207,.24); background: rgba(78,201,207,.10); }
+    .tag.green { color: #7dd8a4; border-color: rgba(61,184,122,.24);  background: rgba(61,184,122,.10); }
+    .tag.purple{ color: #b09de8; border-color: rgba(139,116,224,.24); background: rgba(139,116,224,.10); }
+
+    .hero-side {
+      background: rgba(19,25,41,.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 26px;
+      display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    }
+    .mini-label { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: var(--text-dim); margin-bottom: 10px; }
+    .hero-side ul { list-style: none; display: grid; gap: 10px; }
+    .hero-side li { display: flex; gap: 10px; color: var(--text-mid); font-size: 14px; align-items: flex-start; }
+    .hero-side li::before { content: "→"; color: var(--oracle); flex-shrink: 0; margin-top: 2px; }
+    .hero-note {
+      padding: 16px 18px; border-radius: 18px; border: 1px solid rgba(214,172,82,.18); background: rgba(214,172,82,.06);
+      color: var(--text-mid); font-size: 14px;
+    }
+
+    /* ── SECTION PILLS ── */
+    .section-pills {
+      position: sticky; top: calc(var(--header) + 10px); z-index: 25;
+      display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      max-width: var(--content); margin: 0 auto; padding: 0 20px 14px;
+      scrollbar-width: none;
+    }
+    .section-pills::-webkit-scrollbar { display: none; }
+    .section-pills a {
+      flex: 0 0 auto; font-size: 13px; color: var(--text-mid);
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 999px; padding: 10px 13px; white-space: nowrap;
+    }
+    .section-pills a.active { color: var(--bright); background: rgba(255,255,255,.08); }
+
+    /* ── CONTENT ── */
+    .content { max-width: var(--reading); margin: 0 auto; padding: 0 20px 80px; }
+
+    .section {
+      background: rgba(19,25,41,.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: clamp(24px,3.2vw,34px);
+      margin: 0 0 22px;
+      scroll-margin-top: 100px;
+    }
+
+    .sec-kicker {
+      font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      margin: 0 0 14px; color: var(--bright);
+      font-size: clamp(1.8rem,3.2vw,2.6rem); line-height: 1.06; letter-spacing: -.03em;
+    }
+    h2 .hl { color: var(--oracle); }
+
+    h3 {
+      margin: 28px 0 10px; color: var(--bright); font-size: 1.12rem; letter-spacing: -.01em;
+    }
+
+    p { color: var(--text-mid); margin-bottom: 14px; font-size: 1rem; }
+    .lead-p { font-size: 1.06rem; color: var(--text-mid); }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      margin-top: 20px; padding: 18px 20px; border-radius: 18px;
+      border-left: 3px solid; font-size: .94rem; line-height: 1.65;
+    }
+    .callout strong { display: block; color: var(--bright); margin-bottom: 6px; }
+    .callout.oracle { background: rgba(201,90,67,.07); border-color: var(--oracle); color: #e8b0a0; }
+    .callout.gold   { background: rgba(214,172,82,.07); border-color: var(--gold);   color: #e8d0a0; }
+    .callout.cyan   { background: rgba(78,201,207,.07); border-color: var(--cyan);   color: #9fd8dc; }
+    .callout.green  { background: rgba(61,184,122,.07); border-color: var(--green);  color: #9ad8b8; }
+    .callout.purple { background: rgba(139,116,224,.07); border-color: var(--purple); color: #c0b0e8; }
+
+    /* ── GRIDS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 18px 0; }
+
+    .card {
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px; padding: 18px;
+    }
+    .card h4 { font-size: .92rem; font-weight: 700; color: var(--bright); margin-bottom: 7px; }
+    .card p  { font-size: .87rem; color: var(--text-mid); line-height: 1.55; margin-bottom: 0; }
+    .card-icon { font-size: 1.4rem; margin-bottom: 10px; }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 3px; margin: 18px 0; }
+    .step {
+      display: grid; grid-template-columns: 52px 1fr;
+      background: rgba(19,25,41,.9); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .step-num {
+      background: rgba(201,90,67,.10); display: flex;
+      align-items: center; justify-content: center;
+      font-family: ui-monospace, monospace; font-size: .75rem;
+      color: var(--oracle); font-weight: 600;
+    }
+    .step-body { padding: 14px 18px; }
+    .step-title { font-weight: 700; font-size: .9rem; color: var(--bright); margin-bottom: 4px; }
+    .step-desc  { font-size: .83rem; color: var(--text-mid); line-height: 1.55; margin: 0; }
+    .step-cmd {
+      display: inline-block; margin-top: 8px;
+      font-family: ui-monospace, monospace; font-size: .78rem;
+      color: var(--cyan); background: rgba(78,201,207,.09);
+      padding: 4px 10px; border-radius: 6px;
+    }
+
+    /* ── CODE ── */
+    .code-block {
+      background: rgba(5,8,15,.7); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px; margin: 18px 0; overflow: auto;
+    }
+    .code-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 0; margin-bottom: -2px;
+    }
+    .code-label {
+      font-family: ui-monospace, monospace; font-size: .68rem;
+      color: var(--text-dim); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .dots { display: flex; gap: 5px; }
+    .dots span { width: 9px; height: 9px; border-radius: 50%; }
+    .dots span:nth-child(1) { background: #ff5f57; }
+    .dots span:nth-child(2) { background: #febc2e; }
+    .dots span:nth-child(3) { background: #28c840; }
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .82rem; color: #dce8ff; line-height: 1.7;
+      padding: 14px 18px; white-space: pre-wrap; word-break: break-word; margin: 0;
+    }
+    .k  { color: #7db7ff; }
+    .s  { color: #85e89d; }
+    .c  { color: var(--text-dim); font-style: italic; }
+    .n  { color: #f0c866; }
+    .f  { color: #c792ea; }
+    .o  { color: var(--oracle); }
+    .cy { color: var(--cyan); }
+    .kk { color: #e06c75; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto; border-radius: 18px;
+      border: 1px solid var(--border); margin: 18px 0;
+      background: rgba(13,18,28,.8);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 520px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: top; }
+    th { font-size: .8rem; font-weight: 700; color: var(--bright); background: rgba(255,255,255,.025); }
+    td { font-size: .88rem; color: var(--text-mid); line-height: 1.55; }
+    tr:last-child td { border-bottom: none; }
+    code {
+      font-family: ui-monospace, monospace; font-size: .82em;
+      background: rgba(93,143,255,.12); color: #8ab4e8;
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    .badge {
+      display: inline-block; font-family: ui-monospace, monospace; font-size: .72rem;
+      padding: 2px 8px; border-radius: 5px; font-weight: 600;
+    }
+    .b-free   { background: rgba(61,184,122,.15); color: #6ee8a8; }
+    .b-paid   { background: rgba(201,90,67,.15);  color: #e8906a; }
+    .b-local  { background: rgba(214,172,82,.15); color: #e8c86a; }
+    .b-rest   { background: rgba(78,201,207,.15); color: #6ed8de; }
+    .b-legacy { background: rgba(139,116,224,.15);color: #c0adf0; }
+
+    /* ── ARCH DIAGRAM ── */
+    .arch-diagram {
+      display: grid; grid-template-columns: 1fr 32px 1fr 32px 1fr;
+      gap: 0; align-items: center; margin: 20px 0; padding: 16px 0;
+    }
+    .arch-box {
+      background: rgba(19,25,41,.9); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px; text-align: center;
+    }
+    .arch-box h5 { font-size: .85rem; font-weight: 700; color: var(--bright); margin-bottom: 6px; }
+    .arch-box p  { font-size: .78rem; color: var(--text-mid); line-height: 1.5; margin: 0; }
+    .arch-box.highlight { border-color: rgba(201,90,67,.3); background: rgba(201,90,67,.06); }
+    .arch-arrow { text-align: center; color: var(--oracle); font-size: 1.3rem; }
+
+    /* ── PART NAV ── */
+    .part-nav { display: flex; gap: 12px; flex-wrap: wrap; margin: 40px 0 16px; }
+    .pn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 12px; font-size: .85rem; font-weight: 600;
+      border: 1px solid var(--border); color: var(--text-mid);
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .pn:hover { color: var(--bright); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.05); }
+
+    /* ── FOOTER ── */
+    .footer { max-width: var(--reading); margin: 0 auto; padding: 0 20px 48px; }
+    .footer-panel {
+      background: rgba(19,25,41,.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      color: var(--text-dim); font-size: 14px;
+    }
+    .footer-panel a { color: var(--blue); }
+
+    /* ── ANIMS ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .hero-main, .hero-side { animation: fadeUp .6s ease both; }
+    .hero-side { animation-delay: .12s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .arch-diagram { grid-template-columns: 1fr; }
+      .arch-arrow { transform: rotate(90deg); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .desktop-nav { display: none; }
+      .menu-btn { display: inline-flex; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 36px; }
+      h1 { font-size: 2.2rem; max-width: none; }
+      .section-pills { top: calc(var(--header) + 8px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="site-header">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div class="brand-copy">
+          <div class="brand-title">Oracle AI Codex</div>
+          <div class="brand-sub">Part 3 — OpenClaw for Oracle Teams</div>
+        </div>
+      </div>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-introduction.html">Part 1</a>
+        <a href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-execution-patterns.html">Part 2</a>
+        <a href="#" class="active">Part 3</a>
+        <a href="#what-is">What is it</a>
+        <a href="#install">Install</a>
+        <a href="#workspace">Workspace</a>
+        <a href="#oracle-apis">Oracle APIs</a>
+        <a href="#close-agent">Close Agent</a>
+      </nav>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileNav">Menu</button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <div class="mobile-nav-inner">
+        <a href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-introduction.html">Part 1</a>
+        <a href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-execution-patterns.html">Part 2</a>
+        <a href="#what-is">What is it</a>
+        <a href="#install">Install</a>
+        <a href="#workspace">Workspace</a>
+        <a href="#oracle-apis">Oracle APIs</a>
+        <a href="#close-agent">Close Agent</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div class="hero-main">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Part 3 · Oracle AI Codex</div>
+        <h1>OpenClaw for <span class="accent">Oracle Teams</span> — A Practical Guide</h1>
+        <p class="hero-sub">
+          Parts 1 and 2 laid the foundation: structured context enables reliable AI delivery.
+          Part 3 answers the hands-on questions — what OpenClaw actually is, how you install
+          and configure it, how it connects to Oracle EBS and Fusion Cloud, and what a real
+          sub-ledger close agent looks like running on top of it.
+        </p>
+        <div class="tags">
+          <span class="tag red">Oracle EBS</span>
+          <span class="tag cyan">Fusion Cloud</span>
+          <span class="tag gold">OpenClaw</span>
+          <span class="tag blue">ESS Jobs</span>
+          <span class="tag green">AP Close Agent</span>
+          <span class="tag purple">Autonomous Agents</span>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div>
+          <div class="mini-label">What you'll learn</div>
+          <ul>
+            <li>What OpenClaw is and how its runtime works</li>
+            <li>How to download, install and run it (30 min)</li>
+            <li>How the Codex becomes OpenClaw's memory</li>
+            <li>Which Oracle REST and ESS APIs to call</li>
+            <li>How EBS 12.2 connects without native REST</li>
+            <li>A complete AP close agent with real tool calls</li>
+          </ul>
+        </div>
+        <div class="hero-note">
+          The Codex is the agent's memory. OpenClaw is the runtime that acts on it — against your live Oracle environment.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="section-pills" aria-label="Sections">
+    <a href="#what-is">01 What is it</a>
+    <a href="#install">02 Install</a>
+    <a href="#workspace">03 Workspace</a>
+    <a href="#oracle-apis">04 Oracle APIs</a>
+    <a href="#close-agent">05 Close Agent</a>
+    <a href="#costs">06 Costs</a>
+  </div>
+
+  <main class="content">
+
+    <!-- WHAT IS -->
+    <section class="section" id="what-is">
+      <div class="sec-kicker">01 — What it is</div>
+      <h2>What OpenClaw <span class="hl">actually is</span></h2>
+      <p class="lead-p">
+        OpenClaw is not a SaaS product, not an enterprise orchestration platform, and not
+        something you buy a licence for. It is an open-source, MIT-licensed, local-first
+        AI agent framework that you install on your own machine and run as a persistent
+        background daemon.
+      </p>
+      <p>
+        Created by Peter Steinberger and launched in January 2026, it reached 100,000
+        GitHub stars in under two weeks — one of the fastest-growing open-source repos in
+        GitHub history. The reason is simple: it solves the gap between "I can talk to an
+        AI" and "the AI acts on my behalf while I'm not watching."
+      </p>
+
+      <div class="callout oracle">
+        <strong>The key distinction for Oracle delivery:</strong> OpenClaw is the <em>runtime</em>
+        that executes your agent logic. The Oracle AI Codex — your object naming conventions,
+        validation rules, business logic, deployment standards — becomes the agent's memory.
+        OpenClaw reads that memory on every run and uses it to drive tool calls against Oracle EBS or Fusion Cloud.
+      </div>
+
+      <h3>Three things that make it different</h3>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon">🏠</div>
+          <h4>Local-first</h4>
+          <p>The gateway, memory, and tools run on hardware you control. Memory is stored as plain Markdown files on disk — inspectable, version-controllable, auditable.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⏰</div>
+          <h4>Autonomous</h4>
+          <p>A heartbeat daemon wakes the agent on a schedule without being prompted. Your AP validation checks run at 17:00 whether or not anyone triggers them manually.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔌</div>
+          <h4>Model-agnostic</h4>
+          <p>Connects to Claude, GPT-4o, Gemini, or fully local Ollama models. For Oracle financial work, Claude Sonnet is recommended for its structured-output accuracy.</p>
+        </div>
+      </div>
+
+      <h3>How the runtime works</h3>
+      <p>
+        When you run <code>openclaw gateway</code>, a single long-lived Node.js process starts —
+        called the Gateway. That one process handles everything: channel connections (Teams, Slack,
+        Telegram, etc.), session management, the agent loop, model calls, tool execution, and memory
+        persistence. There is no separate service to manage.
+      </p>
+
+      <div class="arch-diagram">
+        <div class="arch-box highlight">
+          <h5>📁 Codex Workspace</h5>
+          <p>SOUL.md, AGENTS.md, TOOLS.md, MEMORY.md — Oracle rules, object names, validation logic</p>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <h5>⚙️ Gateway :18789</h5>
+          <p>Long-running Node.js daemon. Loads workspace, manages sessions, runs tool calls, fires heartbeats</p>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">
+          <h5>🤖 LLM + Tools</h5>
+          <p>Claude API call → tool calls → Oracle REST/DB → results fed back → reply to Teams/Slack</p>
+        </div>
+      </div>
+
+      <p>
+        On each run — whether triggered by a cron heartbeat, an incoming Teams message, or a
+        webhook — the agent runtime assembles context from all workspace files, calls the model,
+        executes any tool calls the model requests, feeds results back, and repeats until done.
+        Every step runs in the Gateway process on your machine.
+      </p>
+    </section>
+
+    <!-- INSTALL -->
+    <section class="section" id="install">
+      <div class="sec-kicker">02 — Installation</div>
+      <h2>Download and <span class="hl">install OpenClaw</span></h2>
+      <p class="lead-p">
+        You do not need to clone the repository to use OpenClaw. Install it globally via npm
+        and run the onboarding wizard. The whole setup takes under 30 minutes.
+      </p>
+
+      <div class="callout gold">
+        <strong>Prerequisites:</strong> Node.js 22 or later (required — not 18 or 20).
+        An API key from at least one LLM provider. A machine that stays running:
+        a Mac, a Linux server, a VPS, or Oracle Cloud Free Tier (4 ARM cores,
+        24 GB RAM, permanently free — ideal for Oracle teams).
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <div class="step-title">Install the CLI globally</div>
+            <p class="step-desc">This installs the <code>openclaw</code> CLI and the Gateway daemon. No cloning required.</p>
+            <span class="step-cmd">npm install -g openclaw@latest</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <div class="step-title">Run the onboarding wizard</div>
+            <p class="step-desc">Creates <code>~/.openclaw/workspace/</code>, seeds all template files (SOUL.md, AGENTS.md, TOOLS.md, MEMORY.md), and walks through LLM provider setup and channel connection. The <code>--install-daemon</code> flag registers the Gateway as a systemd/launchd service so it survives reboots.</p>
+            <span class="step-cmd">openclaw onboard --install-daemon</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <div class="step-title">Add your Anthropic API key</div>
+            <p class="step-desc">Credentials live in the OpenClaw config, never in workspace markdown files. This is a hard rule for Oracle environments — no credentials in the Codex repo.</p>
+            <span class="step-cmd">openclaw config set providers.anthropic.apiKey "sk-ant-..."</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <div class="step-title">Set your model and spending limit</div>
+            <p class="step-desc">Claude Sonnet is recommended for Oracle financial work. Set a hard monthly spending cap — critical for an always-on agent that could be triggered unexpectedly.</p>
+            <span class="step-cmd">openclaw config set agents.defaults.model "anthropic/claude-sonnet-4-5"</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <div class="step-title">Create the Oracle agent workspace</div>
+            <p class="step-desc">Keep the Oracle close agent in its own isolated workspace so its memory and tool set stay separate from any other agents on the same machine.</p>
+            <span class="step-cmd">openclaw agents add oracle-close --workspace ~/.openclaw/workspace-oracle</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <div class="step-title">Connect Microsoft Teams</div>
+            <p class="step-desc">Teams is the most common notification channel in Oracle delivery. The close agent posts validation reports, escalations, and reconciliation packs directly to a Teams channel.</p>
+            <span class="step-cmd">openclaw channels connect teams</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <div class="step-title">Start the Gateway and verify</div>
+            <p class="step-desc">The doctor command surfaces misconfigured channels, missing credentials, and workspace file issues before your first live run.</p>
+            <span class="step-cmd">openclaw gateway start &amp;&amp; openclaw doctor</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">08</div>
+          <div class="step-body">
+            <div class="step-title">Register the close schedule</div>
+            <p class="step-desc">Cron tasks run inside OpenClaw's scheduler. This fires pre-close validation at 17:00 on the last five days of each month, with no external cron job needed.</p>
+            <span class="step-cmd">openclaw cron add --agent oracle-close --schedule "0 17 27-31 * *" --task "Run AP pre-close validation for current period. Post results to Teams oracle-finance channel."</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKSPACE -->
+    <section class="section" id="workspace">
+      <div class="sec-kicker">03 — Workspace files</div>
+      <h2>The workspace files — <span class="hl">Codex as agent memory</span></h2>
+      <p class="lead-p">
+        Every OpenClaw agent is defined by a set of Markdown files in its workspace directory.
+        These are read on every run to reconstruct the agent's identity, rules, memory, and
+        available tools. This is the direct bridge: your Oracle AI Codex lives here.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>File</th><th>Purpose</th><th>Oracle content to put here</th></tr></thead>
+          <tbody>
+            <tr><td><code>SOUL.md</code></td><td>Identity, hard constraints, operating style</td><td>"Never release holds automatically. Never submit period close without controller sign-off. Never run DML against production."</td></tr>
+            <tr><td><code>AGENTS.md</code></td><td>Step-by-step operating procedures and gate rules</td><td>The exact close sequence: step 1 validate, step 2 gate, step 3 sweep — with explicit human checkpoints written out as instructions</td></tr>
+            <tr><td><code>TOOLS.md</code></td><td>Available tools and how/when to use each</td><td>Oracle API wrapper names, what each returns, when to call them, safety constraints per tool</td></tr>
+            <tr><td><code>MEMORY.md</code></td><td>Curated long-term memory maintained across sessions</td><td>Recurring exception patterns, historical close timelines, known data quality issues per period</td></tr>
+            <tr><td><code>HEARTBEAT.md</code></td><td>Proactive monitoring checklist the agent checks autonomously</td><td>Daily hold-queue depth check, aging invoice alerts, period status monitoring between close runs</td></tr>
+            <tr><td><code>USER.md</code></td><td>Team context — who to notify, how, in what format</td><td>Controller name and Teams handle, AP lead contact, GL team, escalation priority order, timezone</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The SOUL.md for an Oracle close agent</h3>
+      <div class="code-block">
+        <div class="code-top"><div class="dots"><span></span><span></span><span></span></div><div class="code-label">~/.openclaw/workspace-oracle/SOUL.md</div></div>
+        <pre><span class="c"># Oracle Financial Close Agent — SOUL</span>
+
+<span class="o">## Identity</span>
+You are an Oracle financial close agent for AP and AR period-end
+sub-ledger close on Oracle EBS 12.2 and Oracle Fusion Cloud.
+You are an execution agent, not a chatbot. Your job is to run
+pre-close validation, escalate exceptions, coordinate the close
+sequence, and produce reconciliation evidence.
+
+<span class="o">## Hard constraints — never violate these</span>
+- NEVER release AP holds automatically
+- NEVER submit a period close without controller sign-off
+- NEVER proceed past a gate when there are unresolved exceptions
+- NEVER invent business rules — escalate if the Codex is silent
+- NEVER run INSERT, UPDATE, or DELETE against any database
+- NEVER run DML against PROD — only UAT unless explicitly told otherwise
+
+<span class="o">## On uncertainty</span>
+If a check result is ambiguous, stop and escalate. Do not proceed
+on assumption. A wrong close is far worse than a delayed one.
+
+<span class="o">## Output style</span>
+Produce structured JSON or Markdown that humans can act on directly.
+Every escalation must include: the failed check, the record count,
+the named owner, and a specific resolution path.</pre>
+      </div>
+
+      <div class="callout green">
+        <strong>Version-control your workspace as a private Git repo.</strong>
+        Every time the controller adds a new exception routing rule, it is a commit.
+        Your Codex accumulates institutional knowledge that survives team changes,
+        and every audit question about "what rules was the agent following in March"
+        has a precise, timestamped answer.
+      </div>
+    </section>
+
+    <!-- ORACLE APIS -->
+    <section class="section" id="oracle-apis">
+      <div class="sec-kicker">04 — Oracle APIs</div>
+      <h2>Oracle APIs — <span class="hl">how the tools connect</span></h2>
+      <p class="lead-p">
+        OpenClaw's tools are ordinary code — Python scripts, Node.js modules, or shell commands
+        the agent calls by name. The Oracle connection lives inside those tools. Here are the
+        specific APIs each tool wrapper calls.
+      </p>
+
+      <h3>Oracle Fusion Cloud — two REST layers</h3>
+      <p>
+        Fusion Cloud exposes two separate REST API surfaces for the work a close agent needs.
+        Understanding which one to use for which task is the most common stumbling block.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>API endpoint</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Query AP invoices on hold</td>
+              <td><code>/fscmRestApi/resources/11.13.18.05/invoices</code></td>
+              <td><span class="badge b-rest">fscmRestApi</span> Use query parameter <code>?q=holdReasonCode IS NOT NULL</code>. Read-only GET.</td>
+            </tr>
+            <tr>
+              <td>Get accounting period status</td>
+              <td><code>/fscmRestApi/resources/11.13.18.05/accountingPeriods</code></td>
+              <td><span class="badge b-rest">fscmRestApi</span> Returns period name, status (Open/Closed/Never Opened), application ID.</td>
+            </tr>
+            <tr>
+              <td><strong>Submit ESS job</strong> (sweep, transfer to GL)</td>
+              <td><code>/ess/rest/scheduler/v1/requests</code></td>
+              <td><span class="badge b-rest">Scheduler API</span> Introduced in 23B. Preferred over the older erpintegrations endpoint for new implementations. POST with jobDefinitionName, parameters.</td>
+            </tr>
+            <tr>
+              <td>Submit ESS job (legacy / existing integrations)</td>
+              <td><code>/fscmRestApi/resources/11.13.18.05/erpintegrations</code></td>
+              <td><span class="badge b-legacy">erpintegrations</span> Older path still widely used. POST with <code>OperationName: submitESSJobRequest</code>, <code>JobPackageName</code>, <code>JobDefName</code>.</td>
+            </tr>
+            <tr>
+              <td>Poll ESS job status</td>
+              <td><code>/ess/rest/scheduler/v1/requests/{requestId}</code></td>
+              <td><span class="badge b-rest">Scheduler API</span> Returns status: WAIT / RUNNING / SUCCEEDED / FAILED / WARNING. Poll every 60 seconds.</td>
+            </tr>
+            <tr>
+              <td>Query AR receipts (unposted)</td>
+              <td><code>/fscmRestApi/resources/11.13.18.05/receivablesReceipts</code></td>
+              <td><span class="badge b-rest">fscmRestApi</span> Filter with <code>?q=status=UNPOSTED</code>. Returns receipt number, bank account, amount.</td>
+            </tr>
+            <tr>
+              <td>Register ESS callback / webhook</td>
+              <td><code>/ess/rest/scheduler/v1/requests</code> with <code>callbackURL</code></td>
+              <td><span class="badge b-rest">Scheduler API</span> Register a callback URL so Oracle pushes completion status instead of the agent polling.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout cyan">
+        <strong>Use the Scheduler REST API for new work.</strong> Oracle introduced
+        <code>/ess/rest/scheduler/v1/requests</code> in version 23B specifically to support
+        automation, orchestration, and integration of ESS jobs. It supports submit, query,
+        cancel, hold, and callback registration — all the operations a close agent needs.
+        The older <code>erpintegrations</code> endpoint still works but is not being enhanced.
+      </div>
+
+      <h3>Submitting the AP Sweep via Scheduler REST API</h3>
+      <div class="code-block">
+        <div class="code-top"><div class="dots"><span></span><span></span><span></span></div><div class="code-label">Python · tools/submit_payables_sweep.py</div></div>
+        <pre><span class="k">import</span> os, time, requests
+
+<span class="k">def</span> <span class="f">submit_payables_sweep</span>(period: str, operating_unit: str) -> dict:
+    <span class="s">"""
+    Submits the Payables Accounting Periods Close ESS job
+    via Oracle Fusion Scheduler REST API (23B+).
+    Requires gate_approval_confirmed = True before calling.
+    Returns: job_request_id, status
+    """</span>
+    base = os.environ[<span class="s">"FUSION_BASE_URL"</span>]
+    auth = (os.environ[<span class="s">"FUSION_USER"</span>], os.environ[<span class="s">"FUSION_PASS"</span>])
+
+    <span class="c"># Submit the ESS job</span>
+    payload = {
+        <span class="s">"jobDefinitionName"</span>: <span class="s">"APXPCLOSE"</span>,       <span class="c"># AP Period Close</span>
+        <span class="s">"jobDefinitionPackage"</span>: <span class="s">"/oracle/apps/ess/financials/payables/accounting"</span>,
+        <span class="s">"parameters"</span>: [period, operating_unit],
+        <span class="s">"callbackURL"</span>: os.environ.get(<span class="s">"OPENCLAW_WEBHOOK_URL"</span>)  <span class="c"># push on complete</span>
+    }
+    r = requests.post(
+        <span class="s">f"{base}/ess/rest/scheduler/v1/requests"</span>,
+        json=payload, auth=auth,
+        headers={<span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>}
+    )
+    r.raise_for_status()
+    job_id = r.json()[<span class="s">"requestId"</span>]
+
+    <span class="c"># Poll until terminal state (or timeout after 90 min)</span>
+    deadline = time.time() + 5400
+    <span class="k">while</span> time.time() < deadline:
+        status_r = requests.get(
+            <span class="s">f"{base}/ess/rest/scheduler/v1/requests/{job_id}"</span>, auth=auth
+        )
+        status = status_r.json().get(<span class="s">"requestStatus"</span>)
+        <span class="k">if</span> status <span class="k">in</span> (<span class="s">"SUCCEEDED"</span>, <span class="s">"FAILED"</span>, <span class="s">"WARNING"</span>):
+            <span class="k">return</span> {<span class="s">"job_id"</span>: job_id, <span class="s">"status"</span>: status, <span class="s">"period"</span>: period}
+        time.sleep(<span class="n">60</span>)
+
+    <span class="k">return</span> {<span class="s">"job_id"</span>: job_id, <span class="s">"status"</span>: <span class="s">"TIMEOUT"</span>, <span class="s">"period"</span>: period}</pre>
+      </div>
+
+      <h3>Oracle EBS 12.2 — three connection options</h3>
+      <p>
+        EBS does not have a native REST layer as comprehensive as Fusion Cloud. Oracle delivery
+        teams connect OpenClaw tools to EBS via three approaches — choose based on your
+        environment's existing infrastructure:
+      </p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon">🔗</div>
+          <h4>ORDS on EBS</h4>
+          <p>Oracle REST Data Services can be deployed on EBS 12.2 to expose custom PL/SQL procedures and views as REST endpoints. The agent's tools call these endpoints — no direct DB connection required from the agent machine.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🐍</div>
+          <h4>python-oracledb</h4>
+          <p>For read-only validation queries, a Python tool wrapper uses <code>python-oracledb</code> against the EBS read replica. The agent calls the function by name; the function runs approved SQL and returns normalised JSON. No raw SQL in the agent.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">☁️</div>
+          <h4>Oracle Integration Cloud</h4>
+          <p>For teams already using OIC for EBS integrations, the agent calls OIC REST endpoints and OIC handles the EBS adapter connection. No direct DB access needed — the agent only knows the OIC endpoint URL.</p>
+        </div>
+      </div>
+
+      <h3>Example: read-only AP holds query for EBS 12.2</h3>
+      <div class="code-block">
+        <div class="code-top"><div class="dots"><span></span><span></span><span></span></div><div class="code-label">Python · tools/check_open_holds_ebs.py</div></div>
+        <pre><span class="k">import</span> os, oracledb
+
+<span class="k">def</span> <span class="f">check_open_holds</span>(period: str, operating_unit: str) -> dict:
+    <span class="s">"""
+    Read-only. Queries AP_HOLDS_ALL for unreleased holds in period.
+    Never modifies data. Connects to read replica only.
+    """</span>
+    conn = oracledb.<span class="f">connect</span>(
+        user=os.environ[<span class="s">"EBS_RO_USER"</span>],
+        password=os.environ[<span class="s">"EBS_RO_PASS"</span>],
+        dsn=os.environ[<span class="s">"EBS_RO_DSN"</span>]
+    )
+    cur = conn.<span class="f">cursor</span>()
+    cur.<span class="f">execute</span>(<span class="s">"""
+        SELECT h.hold_lookup_code,
+               COUNT(*)                 AS hold_count,
+               SUM(i.invoice_amount)    AS total_held
+        FROM   ap_holds_all h
+        JOIN   ap_invoices_all i  ON i.invoice_id = h.invoice_id
+        JOIN   hr_operating_units ou ON ou.organization_id = i.org_id
+        WHERE  h.release_lookup_code IS NULL
+        AND    ou.name  = :ou
+        AND    TRUNC(i.invoice_date)
+                 BETWEEN (SELECT start_date FROM gl_periods
+                          WHERE  period_name    = :period
+                          AND    application_id = 200)
+                     AND (SELECT end_date   FROM gl_periods
+                          WHERE  period_name    = :period
+                          AND    application_id = 200)
+        GROUP BY h.hold_lookup_code
+        ORDER BY hold_count DESC
+    """</span>, {<span class="s">"ou"</span>: operating_unit, <span class="s">"period"</span>: period})
+
+    rows = cur.<span class="f">fetchall</span>()
+    conn.<span class="f">close</span>()
+
+    total = <span class="f">sum</span>(r[<span class="n">1</span>] <span class="k">for</span> r <span class="k">in</span> rows)
+    <span class="k">return</span> {
+        <span class="s">"check"</span>:   <span class="s">"open_holds"</span>,
+        <span class="s">"period"</span>:  period,
+        <span class="s">"status"</span>:  <span class="s">"CLEAR"</span> <span class="k">if</span> total == <span class="n">0</span> <span class="k">else</span> <span class="s">"EXCEPTIONS_FOUND"</span>,
+        <span class="s">"total"</span>:   total,
+        <span class="s">"by_code"</span>: [{
+            <span class="s">"hold_code"</span>: r[<span class="n">0</span>],
+            <span class="s">"count"</span>:     r[<span class="n">1</span>],
+            <span class="s">"amount"</span>:    <span class="f">float</span>(r[<span class="n">2</span>] <span class="k">or</span> <span class="n">0</span>)
+        } <span class="k">for</span> r <span class="k">in</span> rows]
+    }</pre>
+      </div>
+    </section>
+
+    <!-- CLOSE AGENT -->
+    <section class="section" id="close-agent">
+      <div class="sec-kicker">05 — Close agent</div>
+      <h2>The AP sub-ledger close agent — <span class="hl">end to end</span></h2>
+      <p class="lead-p">
+        With OpenClaw running, the Codex loaded as workspace files, and Oracle tool wrappers
+        registered, this is what the complete AP close agent looks like — from the AGENTS.md
+        procedure through to what the controller sees in Teams.
+      </p>
+
+      <h3>The AGENTS.md close procedure</h3>
+      <p>
+        This is the section of <code>AGENTS.md</code> that the agent reads on every close run.
+        It is written as direct instructions, not config — the agent reads it and follows it
+        step by step. Human gates are written explicitly as STOP instructions.
+      </p>
+      <div class="code-block">
+        <div class="code-top"><div class="dots"><span></span><span></span><span></span></div><div class="code-label">workspace-oracle/AGENTS.md — AP close procedure</div></div>
+        <pre><span class="o">## AP Sub-Ledger Close Procedure</span>
+
+When asked to run AP close, follow this sequence exactly.
+Never skip a step. Never proceed past a gate unless explicitly confirmed.
+
+<span class="cy">### Step 1 — Pre-close validation (you execute)</span>
+Call in this order:
+  check_open_holds(period, operating_unit)
+  check_unapproved_invoices(period, operating_unit)
+  check_unposted_invoices(period, operating_unit)
+  check_unmatched_receipts(period, operating_unit)
+  check_period_status(period, application_id=200)
+
+Collect all results. Call emit_validation_report(results).
+Post the report to Microsoft Teams oracle-finance channel.
+
+<span class="cy">### Step 2 — Exception resolution gate (HUMAN REQUIRED — STOP)</span>
+Do not proceed. The validation report is now in Teams.
+Wait for the AP lead and controller to resolve exceptions
+and reply with "gate approved" before continuing.
+If no response in 4 hours, re-post and tag by name.
+
+<span class="cy">### Step 3 — Confirm clear (you execute)</span>
+Re-run all five checks from Step 1.
+If any exception still exists, return to Step 2.
+If all clear, log confirmation timestamp and continue.
+
+<span class="cy">### Step 4 — Submit AP Sweep (you execute)</span>
+Call submit_payables_sweep(period, operating_unit).
+Log the ESS job request ID.
+Poll until SUCCEEDED or FAILED.
+If FAILED, post error to Teams and stop — do not continue.
+
+<span class="cy">### Step 5 — Transfer to GL (you execute)</span>
+Call submit_transfer_to_gl(period, operating_unit).
+Confirm SUCCEEDED. Log batch count, line count, total amount.
+
+<span class="cy">### Step 6 — AP-to-GL Reconciliation (you execute)</span>
+Call run_ap_gl_reconciliation(period).
+Post reconciliation pack to Teams.
+If variance is ANY non-zero value — stop. Do not proceed.
+
+<span class="cy">### Step 7 — Controller sign-off gate (HUMAN REQUIRED — STOP)</span>
+Controller must reply "recon approved" before period close.
+Even a $0.01 variance requires an explanation comment.
+
+<span class="cy">### Step 8 — Period close (you execute)</span>
+Call submit_period_close(period, operating_unit).
+Confirm status changes to Closed.
+Call emit_close_completion_log(all_steps).
+Post final confirmation to Teams.
+
+<span class="o">## Gate policy</span>
+Never skip a gate under any circumstances.
+If uncertain about a step result, escalate — never assume and proceed.</pre>
+      </div>
+
+      <h3>What the controller sees in Teams</h3>
+      <p>
+        The agent never produces raw query output. Every report it posts is structured,
+        named, and actionable — derived from the JSON your tool wrappers return.
+      </p>
+      <div class="code-block">
+        <div class="code-top"><div class="dots"><span></span><span></span><span></span></div><div class="code-label">Teams · oracle-finance channel</div></div>
+        <pre>📊 <span class="o">Oracle Close Agent</span> — AP Pre-Close Validation
+Period: MAR-2026 | 2026-03-27 17:06 UTC | US Corporate OU
+
+<span class="kk">Overall: EXCEPTIONS FOUND — do not proceed to sweep</span>
+
+❌ <span class="s">open_holds</span>: 14 invoices
+   QTY REC HOLD (8) · PRICE HOLD (4) · TAX VARIANCE (2)
+   Owner: AP Operations | SLA: 4 hours
+
+❌ <span class="s">unapproved_invoices</span>: 3 invoices
+   INV-91042 · TechServ Inc · $42,800 · Approver: J. Morris
+   INV-91078 · CloudOps Ltd · $18,500 · Approver: D. Patel
+   Owner: AP Lead | SLA: 2 hours
+
+✅ unposted_invoices: CLEAR
+✅ unmatched_receipts: CLEAR
+✅ period_status: OPEN ✓
+
+<span class="cy">Gate: HELD — reply "gate approved" once exceptions are resolved.</span>
+@Sarah Chen (Controller) @Marcus Webb (AP Lead)</pre>
+      </div>
+
+      <div class="callout purple">
+        <strong>The compounding effect of memory.</strong> Each period, when the controller resolves
+        a new exception type, that routing rule is added to MEMORY.md and AGENTS.md.
+        The next period, the agent classifies and routes that exception automatically — no explanation
+        needed. The close process gets cleaner, faster, and more predictable every single month.
+        This is the Oracle AI Codex working as designed.
+      </div>
+    </section>
+
+    <!-- COSTS -->
+    <section class="section" id="costs">
+      <div class="sec-kicker">06 — Models &amp; costs</div>
+      <h2>Models, costs, <span class="hl">and practical sizing</span></h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Task</th><th>Recommended model</th><th>Typical cost</th></tr></thead>
+          <tbody>
+            <tr><td>Pre-close validation, exception classification, reconciliation reports</td><td>Claude Sonnet 4.5</td><td><span class="badge b-paid">~$0.10–0.40 per close run</span></td></tr>
+            <tr><td>Daily heartbeat monitoring, queue-depth checks, status pings</td><td>Claude Haiku 4.5 or Ollama Llama 3.2 locally</td><td><span class="badge b-local">Near zero</span></td></tr>
+            <tr><td>Offline / air-gapped / sensitive data environments</td><td>Ollama (fully local, no API calls)</td><td><span class="badge b-free">Hardware only</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Realistic annual cost for an Oracle AP close agent running 12 monthly closes plus
+        daily heartbeats: <strong style="color:var(--bright)">$40–120/year in LLM API fees</strong>. Hosting is free on
+        Oracle Cloud Free Tier. Compare that to the 4–6 hours of senior controller time
+        consumed by the same manual process each period.
+      </p>
+
+      <div class="callout gold">
+        <strong>Set a hard spending limit.</strong> OpenClaw can be triggered by incoming
+        messages, webhooks, and scheduled heartbeats — which means it can accumulate API
+        calls faster than expected in a busy environment. Set
+        <code>providers.anthropic.spendingLimit</code> in <code>openclaw.json</code> before
+        connecting to production Oracle environments. A $20/month cap is a reasonable
+        starting point for a single close agent.
+      </div>
+
+      <div class="part-nav">
+        <a class="pn" href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-introduction.html">← Part 1 · The Oracle AI Codex</a>
+        <a class="pn" href="https://pchunduru12.github.io/Oracle-AI-Blog/oracle-ai-codex-execution-patterns.html">← Part 2 · Execution Patterns</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-panel">
+      <div><strong style="color:var(--bright)">Oracle AI Codex — Part 3</strong><br>OpenClaw for Oracle EBS &amp; Fusion Cloud</div>
+      <div>
+        <a href="https://github.com/openclaw/openclaw">github.com/openclaw/openclaw</a> ·
+        <a href="https://docs.openclaw.ai">docs.openclaw.ai</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    const progressBar = document.getElementById('progressBar');
+    const links = Array.from(document.querySelectorAll('.desktop-nav a, .mobile-nav a, .section-pills a'));
+    const sections = Array.from(document.querySelectorAll('.section[id]'));
+
+    menuBtn?.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+
+    links.forEach(link => link.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+    }));
+
+    function setProgress() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = '#' + entry.target.id;
+        links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === id));
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0.01 });
+
+    sections.forEach(s => observer.observe(s));
+    window.addEventListener('scroll', setProgress, { passive: true });
+    window.addEventListener('load', setProgress);
+    setProgress();
+  </script>
+</body>
+</html>
