@@ -61,7 +61,7 @@
       margin-bottom: 18px;
     }
     h1 {
-      font-size: clamp(2.3rem, 6vw, 4.6rem);
+      font-size: clamp(2.3rem, 6vw, 4.4rem);
       line-height: 1.04; margin: 0 0 16px;
       letter-spacing: -0.04em;
       max-width: 900px;
@@ -107,7 +107,7 @@
     .section { padding: 8px 0 34px; }
     .section h3 { font-size: 1.6rem; margin-bottom: 10px; }
     .two-col {
-      display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
     }
     .panel {
       background: rgba(255,255,255,0.03);
@@ -115,19 +115,6 @@
       border-radius: 20px; padding: 24px;
     }
     .panel p { color: var(--muted); margin-top: 0; }
-    .steps { counter-reset: step; display: grid; gap: 14px; }
-    .step {
-      position: relative; padding: 16px 16px 16px 56px; border-radius: 16px;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-      color: var(--muted);
-    }
-    .step::before {
-      counter-increment: step; content: counter(step);
-      position: absolute; left: 16px; top: 16px;
-      width: 28px; height: 28px; border-radius: 50%;
-      display: grid; place-items: center; font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07111e;
-    }
     footer {
       padding: 34px 0 56px; color: var(--muted); font-size: 0.95rem;
     }
@@ -154,7 +141,7 @@
       <div class="brand">Oracle AI Codex</div>
       <nav class="nav-links">
         <a href="#articles">Articles</a>
-        <a href="#publish">GitHub Pages</a>
+        <a href="#about">Why this series</a>
       </nav>
     </div>
   </header>
@@ -163,10 +150,10 @@
     <section class="hero wrap">
       <div class="eyebrow">Oracle ERP • Fusion Cloud • AI-assisted delivery</div>
       <h1>Oracle architecture articles that move from concept to execution.</h1>
-      <p class="lead">This site publishes practical guidance on how Oracle teams can make AI useful in real delivery work — from the core Oracle AI Codex idea to detailed implementation patterns with measurable outcomes.</p>
+      <p class="lead">This series focuses on a practical question: how can Oracle teams use AI in a way that improves real delivery work? The articles move from the core Oracle AI Codex concept into concrete execution patterns for EBS, Fusion Cloud, integrations, conversions, HDL, reporting, and architecture-led development.</p>
       <div class="actions">
         <a class="btn primary" href="#articles">Read the articles</a>
-        <a class="btn secondary" href="#publish">Publish updates on GitHub Pages</a>
+        <a class="btn secondary" href="#about">Why this series matters</a>
       </div>
     </section>
 
@@ -175,7 +162,7 @@
         <article class="card">
           <div class="small">Part 1</div>
           <h2>The Oracle AI Codex: Introduction</h2>
-          <p>A conceptual foundation for making AI useful in Oracle engineering. This article explains why generic AI output often underperforms in Oracle projects, why EBS and Fusion Cloud need different context, and how a structured repository improves delivery quality.</p>
+          <p>This article defines the Oracle AI Codex as a disciplined way to give AI the right project context. It explains why generic AI often struggles in Oracle work, why EBS and Fusion Cloud need different inputs, and how a structured project repository improves relevance, consistency, and delivery quality.</p>
           <div class="meta">
             <span class="pill">Conceptual framework</span>
             <span class="pill">EBS vs Fusion Cloud</span>
@@ -183,8 +170,8 @@
           </div>
           <ul>
             <li>Defines the Oracle AI Codex in practical terms</li>
-            <li>Explains the platform-specific context problem</li>
-            <li>Shows what should go into a structured project repository</li>
+            <li>Explains the platform-specific context challenge</li>
+            <li>Shows what belongs in a structured Oracle project repository</li>
             <li>Helps teams start with one active workstream</li>
           </ul>
           <a class="btn primary" href="oracle-ai-codex-introduction.html">Open Part 1</a>
@@ -193,56 +180,35 @@
         <article class="card">
           <div class="small">Part 2</div>
           <h2>The Oracle AI Codex: Execution Patterns</h2>
-          <p>A practitioner-oriented article that turns the framework into real Oracle delivery examples. It covers execution patterns for conversions, integrations, HDL, labor distribution, reporting, and developer usage with measurable outcomes.</p>
+          <p>This article applies the framework to real Oracle delivery scenarios. It walks through how developers and architects can use AI in actual workstreams such as conversions, integrations, HDL, labor distribution, and reporting, with clearer execution flow and measurable outcomes.</p>
           <div class="meta">
             <span class="pill">Real-world examples</span>
             <span class="pill">Developer execution</span>
             <span class="pill">Measured outcomes</span>
           </div>
           <ul>
-            <li>Walks through realistic Oracle implementation scenarios</li>
-            <li>Shows how developers can apply AI in actual delivery work</li>
-            <li>Connects prompts, artifacts, execution steps, and outcomes</li>
-            <li>Makes the concept credible for architects and delivery leads</li>
+            <li>Uses realistic Oracle implementation scenarios</li>
+            <li>Shows how developers apply AI during delivery</li>
+            <li>Connects prompts, artifacts, execution steps, and results</li>
+            <li>Makes the framework useful for architects and delivery leads</li>
           </ul>
           <a class="btn primary" href="oracle-ai-codex-execution-patterns.html">Open Part 2</a>
         </article>
       </div>
     </section>
 
-    <section id="publish" class="wrap section">
+    <section id="about" class="wrap section">
       <div class="two-col">
         <div class="panel">
-          <h3>Recommended GitHub Pages structure</h3>
-          <p>Use one repository and keep the file names clean, stable, and URL-friendly.</p>
-          <div class="meta">
-            <span class="pill">Repository: oracle-ai-codex</span>
-            <span class="pill">Public repo</span>
-            <span class="pill">GitHub Pages</span>
-          </div>
-          <pre style="margin:0; white-space:pre-wrap; color:#edf2ff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;">oracle-ai-codex/
-  index.html
-  oracle-ai-codex-introduction.html
-  oracle-ai-codex-execution-patterns.html
-  README.md</pre>
+          <h3>Why this series exists</h3>
+          <p>Oracle delivery teams rarely need generic AI answers. They need output grounded in the exact realities of Oracle ERP and Fusion Cloud projects: object names, conversion rules, approval design, integration patterns, reporting logic, environment constraints, and implementation standards.</p>
+          <p>This series is designed to bridge that gap. Instead of treating AI as a novelty, it shows how to make it useful inside real Oracle project delivery.</p>
         </div>
         <div class="panel">
-          <h3>What to upload</h3>
-          <p>Rename and upload these files into the repository root so the site works immediately on GitHub Pages.</p>
-          <ul>
-            <li><strong>index.html</strong> — homepage that links to both articles</li>
-            <li><strong>oracle-ai-codex-introduction.html</strong> — Part 1</li>
-            <li><strong>oracle-ai-codex-execution-patterns.html</strong> — Part 2</li>
-            <li><strong>README.md</strong> — optional repo overview</li>
-          </ul>
+          <h3>Who should read it</h3>
+          <p>These articles are written for Oracle architects, technical leads, developers, conversion teams, integration teams, and program leaders who want AI to support delivery work more effectively.</p>
+          <p>The goal is not hype. The goal is better specifications, cleaner design artifacts, faster working drafts, more consistent implementation output, and clearer execution patterns.</p>
         </div>
-      </div>
-      <div style="height:18px"></div>
-      <div class="steps">
-        <div class="step"><strong>Create a public repository</strong> using a clean name such as <code>oracle-ai-codex</code>.</div>
-        <div class="step"><strong>Upload these three HTML files</strong> to the repository root.</div>
-        <div class="step"><strong>Go to Settings → Pages</strong> and choose <code>Deploy from a branch</code>, then select <code>main</code> and <code>/(root)</code>.</div>
-        <div class="step"><strong>Open the published URL</strong> and confirm that the homepage links correctly to both article pages.</div>
       </div>
     </section>
   </main>
