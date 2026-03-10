@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080B14">
+  <title>The Oracle AI Codex — Make AI Useful in Oracle Engineering</title>
+  <style>
+    :root {
+      --void:#080B14;
+      --deep:#0D1220;
+      --surface:#131929;
+      --surface-2:#171f33;
+      --border:#24314d;
+      --text:#d8e5f6;
+      --text-mid:#9bb0ca;
+      --text-dim:#7287a5;
+      --bright:#f4f8ff;
+      --gold:#d6ac52;
+      --oracle:#c95a43;
+      --cyan:#4ec9cf;
+      --blue:#5d8fff;
+      --shadow:0 18px 60px rgba(0,0,0,.35);
+      --radius:22px;
+      --content:1120px;
+      --reading:780px;
+      --header:74px;
+    }
+
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+    body {
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(201,90,67,.10), transparent 0 30%),
+        radial-gradient(circle at 85% 20%, rgba(93,143,255,.10), transparent 0 26%),
+        radial-gradient(circle at 50% 100%, rgba(78,201,207,.06), transparent 0 32%),
+        var(--void);
+      color:var(--text);
+      line-height:1.72;
+      overflow-x:hidden;
+    }
+
+    a { color:inherit; text-decoration:none; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .progress {
+      position:fixed; top:0; left:0; right:0; height:3px; z-index:80;
+      background:rgba(255,255,255,.04);
+    }
+    .progress span {
+      display:block; height:100%; width:0;
+      background:linear-gradient(90deg, var(--oracle), var(--gold), var(--cyan));
+      box-shadow:0 0 22px rgba(214,172,82,.45);
+    }
+
+    .site-header {
+      position:sticky; top:0; z-index:70;
+      backdrop-filter: blur(14px);
+      background:rgba(8,11,20,.78);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav {
+      max-width:calc(var(--content) + 40px);
+      min-height:var(--header);
+      margin:0 auto;
+      padding:12px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .brand-mark {
+      width:40px; height:40px; border-radius:12px; flex:0 0 auto;
+      display:grid; place-items:center; font-weight:800; color:var(--gold);
+      background:linear-gradient(135deg, rgba(201,90,67,.17), rgba(214,172,82,.12));
+      border:1px solid rgba(214,172,82,.22);
+    }
+    .brand-copy { min-width:0; }
+    .brand-title { font-size:14px; font-weight:760; letter-spacing:.02em; color:var(--bright); }
+    .brand-sub { font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .desktop-nav { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .desktop-nav a {
+      font-size:13px; color:var(--text-mid); padding:10px 12px; border-radius:999px; transition:.2s ease;
+    }
+    .desktop-nav a:hover, .desktop-nav a.active {
+      color:var(--bright); background:rgba(255,255,255,.06);
+    }
+    .menu-btn {
+      display:none; background:rgba(255,255,255,.05); color:var(--bright);
+      border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px 12px;
+      font-size:14px;
+    }
+    .mobile-nav {
+      display:none;
+      border-top:1px solid rgba(255,255,255,.06);
+      background:rgba(11,16,29,.96);
+    }
+    .mobile-nav.open { display:block; }
+    .mobile-nav-inner {
+      max-width:calc(var(--content) + 40px); margin:0 auto; padding:8px 20px 18px;
+      display:grid; gap:8px;
+    }
+    .mobile-nav a {
+      color:var(--text-mid); background:rgba(255,255,255,.03); border-radius:14px; padding:12px 14px;
+    }
+
+    .hero {
+      position:relative;
+      padding:clamp(44px,7vw,88px) 20px 30px;
+    }
+    .hero-inner {
+      max-width:var(--content); margin:0 auto;
+      display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:24px;
+      align-items:stretch;
+    }
+    .hero-main, .hero-side, .section, .name-card, .footer-panel {
+      background:rgba(19,25,41,.78);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .hero-main { padding:clamp(28px,4vw,46px); }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:10px;
+      font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold);
+      margin-bottom:18px;
+    }
+    .eyebrow::before { content:""; width:28px; height:1px; background:currentColor; opacity:.7; }
+    h1 {
+      margin:0;
+      font-size:clamp(2.7rem,7vw,5.8rem);
+      line-height:.95; letter-spacing:-.05em;
+      max-width:10ch;
+      color:var(--bright);
+    }
+    .accent { display:block; color:var(--gold); }
+    .hero-sub {
+      max-width:58ch; margin:22px 0 0; color:var(--text-mid);
+      font-size:clamp(1rem,1.9vw,1.16rem);
+    }
+    .tags { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+    .tag {
+      font-size:12px; padding:7px 11px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.08); color:var(--text-mid); background:rgba(255,255,255,.04);
+    }
+    .tag.red { color:#ea8d79; border-color:rgba(201,90,67,.24); background:rgba(201,90,67,.10); }
+    .tag.gold { color:var(--gold); border-color:rgba(214,172,82,.24); background:rgba(214,172,82,.10); }
+    .tag.blue { color:#8db1ff; border-color:rgba(93,143,255,.24); background:rgba(93,143,255,.10); }
+    .tag.cyan { color:var(--cyan); border-color:rgba(78,201,207,.24); background:rgba(78,201,207,.10); }
+
+    .hero-side {
+      padding:26px;
+      display:flex; flex-direction:column; justify-content:space-between; gap:18px;
+    }
+    .mini-label {
+      font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--text-dim);
+    }
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
+    }
+    .stat {
+      padding:16px; border-radius:18px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.05);
+    }
+    .stat-n { font-size:1.9rem; font-weight:780; line-height:1; color:var(--bright); }
+    .stat-l { margin-top:8px; font-size:13px; color:var(--text-dim); }
+    .hero-note {
+      padding:16px 18px; border-radius:18px; border:1px solid rgba(214,172,82,.18); background:rgba(214,172,82,.06);
+      color:var(--text-mid); font-size:14px;
+    }
+
+    .section-pills {
+      position:sticky; top:calc(var(--header) + 10px); z-index:25;
+      display:flex; gap:10px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      max-width:var(--content); margin:0 auto; padding:0 20px 14px;
+      scrollbar-width:none;
+    }
+    .section-pills::-webkit-scrollbar { display:none; }
+    .section-pills a {
+      flex:0 0 auto; font-size:13px; color:var(--text-mid);
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07);
+      border-radius:999px; padding:10px 13px;
+    }
+    .section-pills a.active { color:var(--bright); background:rgba(255,255,255,.08); }
+
+    .content { max-width:var(--content); margin:0 auto; padding:0 20px 44px; }
+    .section, .name-card {
+      padding:clamp(24px,3.2vw,34px); margin:0 0 22px;
+    }
+    .name-card-label, .sec-kicker {
+      font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold);
+      margin-bottom:10px;
+    }
+    .section h2, .name-card h2 {
+      margin:0 0 14px; color:var(--bright);
+      font-size:clamp(1.8rem,3.2vw,2.7rem); line-height:1.06; letter-spacing:-.03em;
+      max-width:16ch;
+    }
+    .section h3 {
+      margin:24px 0 10px; color:var(--bright); font-size:1.12rem;
+    }
+    .section p, .name-card p, .section li { color:var(--text-mid); }
+    .section p + p { margin-top:14px; }
+
+    .callout {
+      margin-top:20px; padding:18px 20px; border-radius:18px;
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    }
+    .callout strong { display:block; color:var(--bright); margin-bottom:8px; }
+    .callout.red { border-color:rgba(201,90,67,.20); background:rgba(201,90,67,.07); }
+    .callout.gold { border-color:rgba(214,172,82,.20); background:rgba(214,172,82,.07); }
+    .callout.cyan { border-color:rgba(78,201,207,.20); background:rgba(78,201,207,.07); }
+    .quote-block {
+      margin-top:18px; padding:18px 20px; border-left:3px solid var(--gold);
+      background:rgba(255,255,255,.03); border-radius:0 16px 16px 0; color:var(--bright);
+    }
+
+    .grid-2, .cards-3, .metrics, .compare-grid, .steps, .roadmap-grid {
+      display:grid; gap:16px;
+    }
+    .grid-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .cards-3, .metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .compare-grid { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:18px; }
+    .card, .metric, .compare-card, .roadmap, .code-wrap {
+      background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.06); border-radius:18px;
+    }
+    .card, .metric, .compare-card, .roadmap { padding:18px; }
+    .card h3, .metric h3, .compare-card h3, .roadmap h3 { margin:4px 0 8px; color:var(--bright); }
+    .card-label { font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--text-dim); }
+
+    .compare-card.ebs { border-color:rgba(93,143,255,.22); }
+    .compare-card.cloud { border-color:rgba(78,201,207,.22); }
+    .compare-card ul { margin:12px 0 0 18px; }
+
+    .table-wrap {
+      overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:18px;
+      border:1px solid rgba(255,255,255,.06); border-radius:18px;
+    }
+    table { width:100%; min-width:680px; border-collapse:collapse; background:rgba(255,255,255,.02); }
+    th, td { padding:14px 16px; text-align:left; border-bottom:1px solid rgba(255,255,255,.06); }
+    th { color:var(--bright); font-size:13px; background:rgba(255,255,255,.03); }
+    td { color:var(--text-mid); font-size:14px; }
+
+    .steps { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:16px; }
+    .step {
+      display:flex; gap:14px; align-items:flex-start; padding:18px;
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:18px;
+    }
+    .step-b {
+      width:36px; height:36px; border-radius:12px; flex:0 0 auto;
+      display:grid; place-items:center; font-weight:800; color:var(--bright);
+      background:rgba(255,255,255,.07);
+    }
+    .step strong { display:block; color:var(--bright); margin-bottom:5px; }
+    .step span { color:var(--text-dim); font-size:14px; }
+
+    .code-wrap { margin-top:18px; overflow:hidden; }
+    .code-head {
+      padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:12px; color:var(--text-dim); background:rgba(255,255,255,.03);
+    }
+    pre {
+      margin:0; padding:18px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      color:#dce8ff; font-size:13px; line-height:1.65; background:rgba(5,8,15,.55);
+    }
+
+    .metric .big { font-size:1.9rem; font-weight:800; color:var(--bright); line-height:1; }
+    .metric .small { margin-top:6px; font-size:13px; color:var(--text-dim); }
+
+    .roadmap ol { margin:12px 0 0 18px; color:var(--text-mid); }
+    .roadmap li + li { margin-top:10px; }
+
+    .footer { max-width:var(--content); margin:0 auto; padding:0 20px 34px; }
+    .footer-panel {
+      padding:22px 24px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap;
+      color:var(--text-dim); font-size:14px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner, .grid-2, .cards-3, .metrics, .compare-grid, .roadmap-grid, .steps { grid-template-columns:1fr; }
+      .desktop-nav { display:none; }
+      .menu-btn { display:inline-flex; }
+      .section h2, .name-card h2 { max-width:none; }
+    }
+    @media (max-width: 720px) {
+      .nav, .hero, .content, .footer { padding-left:16px; padding-right:16px; }
+      .section-pills { padding-left:16px; padding-right:16px; top:calc(var(--header) + 8px); }
+      h1 { max-width:none; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .table-wrap { margin-left:-2px; margin-right:-2px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="site-header">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div class="brand-copy">
+          <div class="brand-title">The Oracle AI Codex</div>
+          <div class="brand-sub">A practical framework for AI-ready Oracle development</div>
+        </div>
+      </div>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#platforms">EBS vs Cloud</a>
+        <a href="#context">Context File</a>
+        <a href="#results">Results</a>
+        <a href="#start">Start</a>
+      </nav>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileNav">Menu</button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <div class="mobile-nav-inner">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#platforms">EBS vs Cloud</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#context">Context File</a>
+        <a href="#results">Results</a>
+        <a href="#start">Start</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div class="hero-main">
+        <div class="eyebrow">Oracle ERP · AI Engineering · Practical Guide</div>
+        <h1>Make <span>Your AI Assistant</span> <span class="accent">Useful in Oracle Engineering.</span></h1>
+        <p class="hero-sub">The Oracle AI Codex is a structured repository framework that helps any AI coding assistant work with your Oracle environment more accurately — your naming conventions, deployment process, architecture, and standards. It does not need database credentials to be useful.</p>
+        <div class="tags">
+          <span class="tag red">Oracle EBS</span>
+          <span class="tag cyan">ERP Cloud / Fusion</span>
+          <span class="tag gold">Claude Code</span>
+          <span class="tag blue">GitHub Copilot</span>
+          <span class="tag gold">Cursor · Windsurf</span>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div>
+          <div class="mini-label">What improves</div>
+          <div class="stats-grid">
+            <div class="stat"><div class="stat-n">Faster</div><div class="stat-l">Table and package scaffolding</div></div>
+            <div class="stat"><div class="stat-n">Cleaner</div><div class="stat-l">First drafts with local standards</div></div>
+            <div class="stat"><div class="stat-n">Less</div><div class="stat-l">Standards policing in review</div></div>
+            <div class="stat"><div class="stat-n">No</div><div class="stat-l">Database credentials required</div></div>
+          </div>
+        </div>
+        <div class="hero-note">
+          The goal is not generic AI output. The goal is reliable, environment-aware output for <em>your</em> Oracle team.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="section-pills" aria-label="Sections">
+    <a href="#problem">01 Problem</a>
+    <a href="#architecture">02 Architecture</a>
+    <a href="#platforms">03 EBS vs Cloud</a>
+    <a href="#workflow">04 Workflow</a>
+    <a href="#context">05 Context File</a>
+    <a href="#results">06 Results</a>
+    <a href="#start">07 Start</a>
+  </div>
+
+  <main class="content">
+    <section class="section" id="problem">
+      <div class="sec-kicker">01 — The problem</div>
+      <h2>Why Oracle teams struggle to get reliable AI output</h2>
+      <p>Custom PL/SQL packages with incomplete history. A staging table nobody fully owns because the original developer is gone. An AI assistant that writes syntactically valid code, but still gets the architecture wrong — wrong naming, wrong layer, wrong deployment assumptions, wrong EBR handling.</p>
+      <p>The issue is usually not the AI model itself. The issue is that the repository does not expose enough context for the assistant to be dependable.</p>
+      <div class="callout red">
+        <strong>The real cost</strong>
+        <ul>
+          <li>New developers ramp slowly because standards live in people’s heads.</li>
+          <li>AI produces generic Oracle output that violates local conventions.</li>
+          <li>Code review becomes standards policing instead of design review.</li>
+          <li>When a developer leaves, institutional memory leaves too.</li>
+        </ul>
+      </div>
+      <div class="quote-block">The way you structure custom Oracle work determines whether AI becomes a force multiplier or just a faster way to generate drafts you still have to rewrite.</div>
+    </section>
+
+    <section class="name-card">
+      <div class="name-card-label">A better term than “just another repo”</div>
+      <h2>The Oracle AI Codex</h2>
+      <p>A structured, version-controlled repository of your custom Oracle extensions and integrations — organized so an AI assistant can understand your architecture, standards, examples, and deployment process quickly.</p>
+      <p>Not a documentation dump and not a PDF that goes stale after week one. A living, AI-readable codex that helps enforce standards at write time — before review, QA, and production.</p>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="sec-kicker">02 — How it works</div>
+      <h2>The structure is simple, but the impact is meaningful</h2>
+      <p>The Oracle AI Codex has two main ingredients. First, a consistent directory structure across projects. Second, an AI context file such as <code>AI_CONTEXT.md</code>, <code>CLAUDE.md</code>, or <code>.cursorrules</code> that carries your rules into every interaction.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>AI Tool</th><th>File Name</th><th>Location</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Claude Code</td><td><code>CLAUDE.md</code></td><td>Repo root + project folder</td></tr>
+            <tr><td>GitHub Copilot</td><td><code>copilot-instructions.md</code></td><td><code>.github/</code></td></tr>
+            <tr><td>Cursor</td><td><code>.cursorrules</code></td><td>Repo root</td></tr>
+            <tr><td>Windsurf</td><td><code>.windsurfrules</code></td><td>Repo root</td></tr>
+            <tr><td>Any LLM / API</td><td>Any name</td><td>Inject into system prompt</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout cyan">
+        <strong>Designed to be tool-agnostic</strong>
+        <p>Your institutional knowledge should belong to your team, not a single AI vendor. The same content can guide Claude, Copilot, Cursor, Windsurf, or your own LLM workflow.</p>
+      </div>
+    </section>
+
+    <section class="section" id="platforms">
+      <div class="sec-kicker">03 — The platform split</div>
+      <h2>Oracle EBS and ERP Cloud need different AI context strategies</h2>
+      <p>The codex idea works for both platforms, but the information the AI needs is different. That is the key design point.</p>
+      <div class="compare-grid">
+        <article class="compare-card ebs">
+          <div class="card-label">Oracle EBS R12.x</div>
+          <h3>The AI can learn from DDL and schema structure</h3>
+          <ul>
+            <li>Direct database access and custom PL/SQL</li>
+            <li>Custom schemas such as XXCUS, APPS, XXAPX, XXORDS</li>
+            <li>Edition-Based Redefinition matters</li>
+            <li>Deployment is ordered SQL execution</li>
+            <li>DDL files teach the AI your data model directly</li>
+          </ul>
+        </article>
+        <article class="compare-card cloud">
+          <div class="card-label">Oracle ERP Cloud / Fusion</div>
+          <h3>The AI must learn from payloads, mappings, and promotion rules</h3>
+          <ul>
+            <li>No direct database access</li>
+            <li>Extensions live in OIC, BIP, VBCS, FBDI, Groovy, OTBI</li>
+            <li>Oracle quarterly updates shape your design choices</li>
+            <li>Deployment is promotion across environments</li>
+            <li>REST payload examples become the equivalent of DDL</li>
+          </ul>
+        </article>
+      </div>
+      <h3>The most important difference for AI context</h3>
+      <p>In EBS, the AI can inspect DDL and understand the actual structure of tables, columns, constraints, and relationships. In ERP Cloud, there is no DDL to inspect. That means the context file must include real REST payloads, field mappings, authentication patterns, and release expectations. For Cloud teams, payload examples play the role that DDL plays in EBS.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Codex Element</th><th>Oracle EBS</th><th>ERP Cloud</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Project structure</td><td>Schema-based</td><td>Layer-based</td></tr>
+            <tr><td>AI learns data model from</td><td>DDL in repo</td><td>REST payloads in context</td></tr>
+            <tr><td>Core context content</td><td>Schemas, PL/SQL, EBR rules</td><td>REST catalog, OAuth, FBDI maps</td></tr>
+            <tr><td>Deployment artifacts</td><td>Ordered SQL scripts</td><td>Exports and promotion checklist</td></tr>
+            <tr><td>Main risk</td><td>Wrong deployment chain</td><td>Invented fields or brittle integrations</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <div class="sec-kicker">04 — What changes in practice</div>
+      <h2>Once the codex exists, the AI can generate work that fits your environment</h2>
+      <p>Without the codex, the AI usually produces isolated snippets. With it, the AI can generate work that respects your packaging, sequencing, and conventions.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-b">01</div>
+          <div><strong>EBS: create the base table</strong><span>Includes standard columns, comments, DDL naming, and the right schema placement.</span></div>
+        </div>
+        <div class="step">
+          <div class="step-b">02</div>
+          <div><strong>EBS: create or upgrade the edition view</strong><span>The assistant knows that EBR is part of the pipeline, not an afterthought.</span></div>
+        </div>
+        <div class="step">
+          <div class="step-b">03</div>
+          <div><strong>EBS: grant correctly across the chain</strong><span>Including the editioned layer that teams often miss.</span></div>
+        </div>
+        <div class="step">
+          <div class="step-b">04</div>
+          <div><strong>Cloud: generate mappings and flow artifacts</strong><span>Using real payload examples, auth rules, and promotion expectations.</span></div>
+        </div>
+      </div>
+      <div class="callout gold">
+        <strong>What changes</strong>
+        <p>You stop asking the assistant to “write some code” in the abstract. You start asking it to work inside a system that already knows your architecture, naming, dependencies, and release discipline.</p>
+      </div>
+    </section>
+
+    <section class="section" id="context">
+      <div class="sec-kicker">05 — The context file</div>
+      <h2>What belongs in the AI context file</h2>
+      <p>Six sections create the “understands our environment” effect. If one is missing, the assistant becomes weaker in that area.</p>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-label">1</div>
+          <h3>Repository overview</h3>
+          <p>What the repository contains, what modules it covers, and what it explicitly does not contain.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">2</div>
+          <h3>Architecture</h3>
+          <p>For EBS, schema ownership and access chain. For Cloud, extension layers and which layer owns business logic.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">3</div>
+          <h3>Naming conventions</h3>
+          <p>Often the highest-value section. It influences almost every file, object, parameter, and variable the AI creates.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">4</div>
+          <h3>Code standards</h3>
+          <p>Logging, exception handling, package structure, comments, sequencing, and reusable templates.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">5</div>
+          <h3>Deployment process</h3>
+          <p>The order in which artifacts are created, compiled, promoted, and validated across environments.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">6</div>
+          <h3>Project inventory</h3>
+          <p>Real examples that show the assistant what “good” looks like in your environment.</p>
+        </article>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">Example naming excerpt</div>
+        <pre>| Object Type      | Pattern                   | Example                    |
+|------------------|---------------------------|----------------------------|
+| Custom table     | XXCUS_[MOD]_[NAME]        | XXCUS_HR_EMPLOYEES         |
+| Custom package   | XXCUS_[MOD]_[NAME]_PK     | XXCUS_HR_EMP_CONV_PK       |
+| Package spec     | ..._PKS.sql               | XXCUS_HR_EMP_CONV_PKS.sql  |
+| IN parameter     | p_[name]                  | p_batch_id                 |
+| OUT parameter    | x_[name]                  | x_return_status            |
+| Local variable   | l_[name]                  | l_employee_count           |</pre>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="sec-kicker">06 — Why teams feel it quickly</div>
+      <h2>The benefits usually appear quickly</h2>
+      <div class="metrics">
+        <article class="metric"><div class="big">Faster setup</div><div class="small">Teams can scaffold EBS table and package work much faster when the pipeline is encoded in the repository.</div></article>
+        <article class="metric"><div class="big">Better first drafts</div><div class="small">Conversion packages start closer to your preferred logging, exception handling, and structure.</div></article>
+        <article class="metric"><div class="big">Faster onboarding</div><div class="small">New team members become productive sooner when standards and examples are visible from day one.</div></article>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <article class="card">
+          <div class="card-label">Before</div>
+          <h3>Standards live mostly in memory</h3>
+          <p>People remember them unevenly. AI does not know them. Reviewers repeat the same corrections.</p>
+        </article>
+        <article class="card">
+          <div class="card-label">After</div>
+          <h3>Standards live in the repository</h3>
+          <p>The assistant sees them repeatedly. Developers see them in examples. Reviewers spend less time correcting avoidable drift.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="start">
+      <div class="sec-kicker">07 — How to start</div>
+      <h2>How to start without boiling the ocean</h2>
+      <p>Do not begin by restructuring everything. Start with one active project, one solid context file, and one or two gold-standard examples. The goal is to prove that the structure improves accuracy before you scale it across the entire portfolio.</p>
+      <div class="roadmap-grid grid-2">
+        <article class="roadmap">
+          <div class="card-label">For Oracle EBS teams</div>
+          <ol>
+            <li>Write the root context file with schemas, naming, EBR flow, and logging standards.</li>
+            <li>Structure one active project with XXCUS, APPS, UI/API layers, and patch folders.</li>
+            <li>Extract and store real DDL so the assistant can read the data model directly.</li>
+            <li>Create one gold-standard example project before expanding broadly.</li>
+          </ol>
+        </article>
+        <article class="roadmap">
+          <div class="card-label">For ERP Cloud teams</div>
+          <ol>
+            <li>Write the root context file around payloads, auth patterns, field mappings, and promotion rules.</li>
+            <li>Structure one integration project with OIC, BIP, FBDI, config, and support artifacts.</li>
+            <li>Add representative payload examples and mapping documents for the highest-value objects.</li>
+            <li>Capture a release checklist so promotion discipline becomes part of the codex.</li>
+          </ol>
+        </article>
+      </div>
+      <div class="code-wrap">
+        <div class="code-head">Recommended repository shape</div>
+        <pre>oracle-ai-codex/
+├── AI_CONTEXT.md
+├── docs/
+├── projects/
+│   ├── employee-conversion/
+│   │   ├── AI_CONTEXT.md
+│   │   ├── APPS/PLSQL/
+│   │   ├── XXCUS/TABLES/
+│   │   └── PATCHES/PROJ-1234/V1/
+│   └── ap-invoice-sync/
+│       ├── AI_CONTEXT.md
+│       ├── INTEGRATIONS/OIC/
+│       ├── FBDI/mappings/
+│       └── PATCHES/PROJ-2891/V1/
+└── shared/</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-panel">
+      <div><strong style="color:var(--bright)">The Oracle AI Codex</strong><br>Edited HTML with cleaner content, mobile navigation, and safer iPhone scrolling.</div>
+      <div>Works with Claude Code · GitHub Copilot · Cursor · Windsurf · or any LLM given repository-aware context</div>
+    </div>
+  </footer>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    const progressBar = document.getElementById('progressBar');
+    const links = Array.from(document.querySelectorAll('.desktop-nav a, .mobile-nav a, .section-pills a'));
+    const sections = Array.from(document.querySelectorAll('main section[id]'));
+
+    menuBtn?.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+
+    links.forEach(link => link.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+    }));
+
+    function setProgress() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = '#' + entry.target.id;
+        links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === id));
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0.01 });
+
+    sections.forEach(section => observer.observe(section));
+    window.addEventListener('scroll', setProgress, { passive: true });
+    window.addEventListener('load', setProgress);
+    setProgress();
+  </script>
+</body>
+</html>
