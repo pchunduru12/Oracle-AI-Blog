@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Oracle AI Codex — Real-World Oracle ERP & Cloud Delivery Patterns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --bg2:#10172b; --card:#151f37; --line:#24324f; --text:#d9e6f5; --muted:#98aaca;
+  --bright:#f4f9ff; --red:#d35443; --gold:#d3a94d; --blue:#4c8dff; --cyan:#49c0c8; --green:#5ac783;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,var(--bg),#0d1426 30%,#0a1020 100%);color:var(--text);line-height:1.7;-webkit-text-size-adjust:100%;overflow-x:hidden}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+.container{width:min(1160px,calc(100% - 32px));margin:0 auto}
+.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(11,16,32,.8);border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--bright)}
+.brand-badge{width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,var(--red),var(--blue))}
+.nav-links{display:flex;flex-wrap:wrap;gap:10px}
+.nav-links a{padding:9px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;color:var(--muted);font-size:14px}
+.nav-links a:hover{color:var(--bright);border-color:rgba(255,255,255,.2)}
+.hero{position:relative;padding:72px 0 42px;overflow:hidden}
+.hero:before,.hero:after{content:'';position:absolute;border-radius:999px;filter:blur(60px);opacity:.25;pointer-events:none}
+.hero:before{width:380px;height:380px;background:var(--red);left:-80px;top:-30px}
+.hero:after{width:420px;height:420px;background:var(--blue);right:-120px;top:40px}
+.kicker{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid rgba(255,255,255,.08);border-radius:999px;color:var(--gold);background:rgba(255,255,255,.03);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:28px;align-items:center;margin-top:20px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(40px,6vw,78px);line-height:1.02;color:var(--bright);max-width:14ch;margin:16px 0}
+.hero p.lead{font-size:clamp(18px,2vw,22px);color:#c5d6ef;max-width:62ch}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:24px;box-shadow:var(--shadow)}
+.hero-card{padding:24px}
+.hero-card h3{font-size:16px;color:var(--bright);margin-bottom:10px}
+.hero-card ul{list-style:none;display:grid;gap:10px}
+.hero-card li{display:flex;gap:10px;color:var(--muted)}
+.hero-card li:before{content:'◆';color:var(--gold);margin-top:1px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.stat{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.stat b{display:block;color:var(--bright);font-size:24px}
+.stat span{color:var(--muted);font-size:14px}
+main section{padding:34px 0}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.section-title h2{font-family:'Playfair Display',serif;color:var(--bright);font-size:clamp(30px,4vw,46px);line-height:1.05}
+.section-title p{max-width:56ch;color:var(--muted)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{padding:24px}
+.card h3{color:var(--bright);font-size:22px;margin-bottom:8px}
+.card p,.card li{color:var(--muted)}
+.card ul{padding-left:18px;display:grid;gap:8px}
+.callout{border-left:4px solid var(--gold);padding:16px 18px;background:rgba(211,169,77,.08);border-radius:0 16px 16px 0;color:#ecd8a9}
+.case-study{display:grid;gap:18px}
+.case-head{padding:24px 24px 14px}
+.case-head h3{font-size:28px;color:var(--bright)}
+.case-head p{color:var(--muted);max-width:75ch;margin-top:8px}
+.case-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:0 24px 24px}
+.subcard{padding:18px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.subcard h4{font-size:15px;letter-spacing:.02em;color:var(--gold);margin-bottom:10px;text-transform:uppercase}
+.subcard p,.subcard li{color:var(--muted);font-size:15px}
+.subcard ul{padding-left:18px;display:grid;gap:7px}
+.code{font-family:'JetBrains Mono',monospace;background:#09111f;border:1px solid rgba(255,255,255,.08);padding:14px 16px;border-radius:14px;color:#d7ecff;font-size:13px;line-height:1.7;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi .tile{padding:14px;border-radius:16px;background:rgba(76,141,255,.08);border:1px solid rgba(76,141,255,.18)}
+.kpi b{display:block;color:var(--bright);font-size:20px}
+.kpi span{color:var(--muted);font-size:14px}
+.footer{padding:36px 0 56px;color:var(--muted)}
+.footer .panel{padding:24px}
+.small{font-size:13px;color:var(--muted)}
+@media (max-width: 900px){
+  .hero-grid,.grid-2,.case-grid,.kpi{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hero h1{max-width:unset}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top"><span class="brand-badge"></span><span>Oracle AI Codex</span></a>
+    <nav class="nav-links">
+      <a href="#why">Why this matters</a>
+      <a href="#patterns">Delivery patterns</a>
+      <a href="#example1">AP Conversion</a>
+      <a href="#example2">Supplier Integration</a>
+      <a href="#example3">HDL Conversion</a>
+      <a href="#example4">Labor Distribution</a>
+      <a href="#example5">Reporting</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="container">
+      <span class="kicker">Oracle ERP & Cloud Architecture • Real-world AI usage</span>
+      <div class="hero-grid">
+        <div>
+          <h1>How Oracle teams can use AI to deliver production-ready work, not just faster drafts.</h1>
+          <p class="lead">The right AI setup does not replace Oracle architects, developers, analysts, or testers. It helps them execute repetitive delivery work with more consistency: mappings, validation SQL, HDL sequencing, interface logic, reconciliation rules, defect triage, and test evidence. The value comes when AI is grounded in your design standards, target objects, and real implementation constraints.</p>
+          <div class="stats">
+            <div class="stat"><b>5</b><span>Detailed Oracle delivery examples</span></div>
+            <div class="stat"><b>4-part</b><span>Pattern in each example: scenario, execution, code, outcomes</span></div>
+            <div class="stat"><b>Real</b><span>Focused on work developers and leads actually perform</span></div>
+          </div>
+        </div>
+        <aside class="panel hero-card">
+          <h3>What this blog shows</h3>
+          <ul>
+            <li>How a developer frames an Oracle task for AI with the right inputs</li>
+            <li>What AI can generate reliably: SQL, mappings, HDL structure, REST payload patterns, validation logic, and defect classifications</li>
+            <li>How the team reviews and executes that output safely inside delivery controls</li>
+            <li>What outcomes can be measured instead of relying on vague “productivity” claims</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="container">
+      <div class="section-title">
+        <h2>Why this matters in Oracle delivery</h2>
+        <p>Oracle projects are full of repeatable design work that still consumes senior time: translating requirements into setup artifacts, validating source data, creating reconciliation logic, drafting design documents, sequencing loads, and triaging conversion or integration errors. AI helps most when the task is structured, high-volume, and reviewable.</p>
+      </div>
+      <div class="grid-2">
+        <div class="panel card">
+          <h3>Where AI helps most</h3>
+          <ul>
+            <li>Converting requirements into technical artifacts with consistent structure</li>
+            <li>Generating first-pass validation SQL and reconciliation rules</li>
+            <li>Creating repeatable templates for HDL, FBDI, REST, BIP, OTBI, and test cases</li>
+            <li>Summarizing defect patterns and mapping them to likely root causes</li>
+          </ul>
+        </div>
+        <div class="panel card">
+          <h3>Where humans still lead</h3>
+          <ul>
+            <li>Choosing the architecture and governing cross-pillar design decisions</li>
+            <li>Validating legal, payroll, security, and accounting impacts</li>
+            <li>Approving edge-case handling and exception strategy</li>
+            <li>Signing off production readiness and supportability</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:20px">The useful question is not “Can AI do Oracle work?” It is “Which Oracle tasks can be turned into well-bounded execution patterns, reviewed quickly, and measured with visible outcomes?”</div>
+    </div>
+  </section>
+
+  <section id="patterns">
+    <div class="container">
+      <div class="section-title">
+        <h2>The operating pattern</h2>
+        <p>In every example below, the same delivery model appears: define the target object, provide implementation context, ask AI for a specific artifact, review the output against design rules, execute in a controlled environment, then measure the impact with visible metrics.</p>
+      </div>
+      <div class="panel card">
+        <div class="code">1) Give AI context: target module, source columns, target objects, design rules, naming standards, known edge cases.
+2) Ask for a bounded artifact: mapping sheet, SQL, HDL file structure, REST payload, defect matrix, or report spec.
+3) Review with an architect or lead developer.
+4) Execute in DEV or test pod.
+5) Measure outcomes: cycle time, defect leakage, first-pass acceptance, reconciliation match rate, rework hours, and support tickets.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="example1">
+    <div class="container panel case-study">
+      <div class="case-head">
+        <h3>Example 1 — EBS AP invoice conversion to a standardized target model</h3>
+        <p><strong>Scenario:</strong> A client is consolidating legacy AP invoice data into Oracle EBS or preparing a historical conversion archive for downstream reporting. The source includes invoice headers, distributions, tax lines, supplier site variations, and inconsistent payment terms. The team has hundreds of source columns and repeated reconciliation questions from finance.</p>
+      </div>
+      <div class="case-grid">
+        <div class="subcard"><h4>Detailed design</h4><ul><li>Target objects: invoice header, invoice line/distribution, supplier reference, payment terms, accounting date, GL date, and status fields.</li><li>AI input package: source-to-target column list, data profiling results, conversion rules, known invalid supplier sites, and examples of rejected invoices.</li><li>Expected AI artifacts: first-pass mapping sheet, validation SQL, reject reason matrix, and reconciliation checklist.</li><li>Architect review focuses on accounting date logic, duplicate invoice prevention, and supplier/site derivation rules.</li></ul></div>
+        <div class="subcard"><h4>How a developer uses it</h4><p>The developer provides a structured prompt with source columns, target columns, lookup rules, and a small set of sample rows. AI generates a draft mapping and validation pack. The developer then adjusts joins, adds environment-specific table names, and runs the validation queries in DEV.</p><div class="code">Prompt input:
+- Source file columns: vendor_num, vendor_site_code, invoice_num, invoice_date, amount, tax_amount, gl_date, terms_name
+- Target model: AP invoices with header and distribution validation
+- Rules: reject duplicate invoice_num by supplier/site; default terms from supplier site if missing; gl_date must be in open period
+- Output needed: mapping table + validation SQL + reject reasons</div></div>
+        <div class="subcard"><h4>Working example</h4><div class="code">Sample validation SQL skeleton
+
+SELECT s.vendor_num,
+       s.vendor_site_code,
+       s.invoice_num,
+       CASE
+         WHEN aps.vendor_id IS NULL THEN 'INVALID_SUPPLIER'
+         WHEN assa.vendor_site_id IS NULL THEN 'INVALID_SITE'
+         WHEN EXISTS (
+           SELECT 1
+             FROM ap_invoices_all aia
+            WHERE aia.invoice_num = s.invoice_num
+              AND aia.vendor_id   = aps.vendor_id
+         ) THEN 'DUPLICATE_INVOICE'
+         WHEN NOT EXISTS (
+           SELECT 1
+             FROM gl_period_statuses gps
+            WHERE gps.application_id = 200
+              AND gps.closing_status = 'O'
+              AND s.gl_date BETWEEN gps.start_date AND gps.end_date
+         ) THEN 'CLOSED_GL_PERIOD'
+         ELSE 'VALID'
+       END validation_status
+  FROM xx_ap_invoice_stg s,
+       ap_suppliers aps,
+       ap_supplier_sites_all assa
+ WHERE aps.segment1(+) = s.vendor_num
+   AND assa.vendor_site_code(+) = s.vendor_site_code
+   AND assa.vendor_id(+) = aps.vendor_id;</div></div>
+        <div class="subcard"><h4>Execution and measured outcome</h4><ul><li>Run validation SQL before conversion load; classify rows by reject reason and send only valid rows forward.</li><li>Use AI-generated reconciliation logic to compare source invoice count/amount to staged and imported results.</li><li><strong>Measured outcomes:</strong> first-pass mapping preparation reduced from 2 days to 4 hours; reject analysis pack prepared in under 1 hour; finance reconciliation meeting time reduced because reject categories were already grouped.</li><li><strong>What to measure:</strong> percentage of invoices validated before import, duplicate detection rate, number of manual mapping clarifications, and first-cycle load success rate.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="example2">
+    <div class="container panel case-study">
+      <div class="case-head">
+        <h3>Example 2 — Fusion supplier onboarding from ServiceNow or an intake platform</h3>
+        <p><strong>Scenario:</strong> The business wants supplier requests to start in ServiceNow, pass through validations and approvals, and create or update supplier records in Fusion. Delivery teams often lose time documenting field mappings, status transitions, payload examples, and error handling logic.</p>
+      </div>
+      <div class="case-grid">
+        <div class="subcard"><h4>Detailed design</h4><ul><li>Define the canonical supplier request model: legal name, tax details, address, contact, payment terms, business classifications, and bank data handling strategy.</li><li>Design status model: Submitted → Validated → Approved → Sent to Fusion → Created / Rejected / Requires Correction.</li><li>AI produces integration field mapping, validation rules, REST payload draft, and an error catalog for common failures.</li><li>Architect and security lead validate data ownership, approvals, and segregation of duties.</li></ul></div>
+        <div class="subcard"><h4>How a developer uses it</h4><p>The developer feeds AI the intake form fields, Fusion target attributes, approval checkpoints, and sample failure messages from prior integrations. AI drafts the mapping sheet and JSON payload pattern. The developer inserts real endpoint names, authentication method, and middleware-specific transformations.</p><div class="code">Developer asks AI for:
+- request-to-Fusion supplier mapping
+- status transition matrix
+- REST payload example for supplier + site
+- error handling table with retry / manual correction / reject categories
+- test cases for missing tax ID, duplicate supplier, invalid country, and bank validation failure</div></div>
+        <div class="subcard"><h4>Working example</h4><div class="code">Sample execution pattern
+
+1. ServiceNow request captured with supplier attributes
+2. Pre-validation checks run:
+   - duplicate tax ID
+   - duplicate supplier name + country
+   - required fields by supplier type
+3. Middleware sends approved request to Fusion REST API
+4. Response stored with request ID and Fusion supplier number
+5. Failures routed by category:
+   - retryable: timeout, transient API failure
+   - data correction: invalid country code, missing tax registration
+   - manual review: duplicate supplier match</div><div class="code" style="margin-top:12px">Measured control table
+request_id | validation_status | fusion_status | error_code | owner | aging_days</div></div>
+        <div class="subcard"><h4>Execution and measured outcome</h4><ul><li>Developer uses AI-generated error catalog to build routing logic into middleware and support dashboards.</li><li>AI-generated test cases reduce missed edge cases during SIT.</li><li><strong>Measured outcomes:</strong> design documentation prepared in half a day instead of 2–3 days; SIT defect triage accelerated because failures were already categorized; support teams gained a clearer ownership model by error type.</li><li><strong>What to measure:</strong> average onboarding cycle time, percentage of requests auto-created without manual intervention, duplicate detection accuracy, and aging by error bucket.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="example3">
+    <div class="container panel case-study">
+      <div class="case-head">
+        <h3>Example 3 — Fusion HCM worker conversion using HDL</h3>
+        <p><strong>Scenario:</strong> A client is moving worker data into Fusion HCM. The challenge is not only creating HDL files; it is sequencing entities correctly, validating lookup values, handling effective dates, and reducing repeat failures across load cycles.</p>
+      </div>
+      <div class="case-grid">
+        <div class="subcard"><h4>Detailed design</h4><ul><li>Break the conversion into worker, work relationship, assignment, legislative info, salary, costing, and element entry layers.</li><li>Provide AI with sample HDL templates, conversion rules, valid lookup values, and known sequencing dependencies.</li><li>Ask AI for sequencing matrix, validation checklist, mock load plan, and issue classification by HDL object.</li><li>Review focuses on date-effective logic, legal employer assignment, worker type rules, and payroll/legal entity dependencies.</li></ul></div>
+        <div class="subcard"><h4>How a developer uses it</h4><p>The developer provides sample source rows and target HDL business objects. AI drafts the HDL structure, load sequencing notes, and validation rules. The developer then formats the final DAT files, confirms required metadata, and runs a controlled mock load.</p><div class="code">Useful prompt inputs
+- Source columns: person number, hire date, legal employer, business unit, location, grade, salary basis
+- Target objects: Worker.dat, WorkRelationship.dat, Assignment.dat, Salary.dat
+- Rules: new hires only, one primary assignment, grade required for exempt workers, location must exist in target
+- Output: sequencing table + validation rules + issue catalog</div></div>
+        <div class="subcard"><h4>Working example</h4><div class="code">Example issue catalog generated with AI
+
+Issue Type                 Likely Cause                     Action
+------------------------   -----------------------------   ------------------------------
+INVALID_LEGAL_EMPLOYER     source value not in target      map to approved target value
+MISSING_LOCATION           target location not created     load foundation data first
+BAD_EFFECTIVE_START_DATE   date before enterprise setup    correct source or split load
+MULTIPLE_PRIMARY_FLAGS     source assignment error         fix source assignment logic
+INVALID_GRADE              grade not valid for BU          remap using grade crosswalk</div><div class="code" style="margin-top:12px">Example measured cycle controls
+cycle_no | workers_attempted | workers_loaded | errors | top_error_type | rerun_hours</div></div>
+        <div class="subcard"><h4>Execution and measured outcome</h4><ul><li>Developer uses AI-generated issue catalog to prepare source cleansing before each mock cycle.</li><li>AI-generated sequencing notes reduce trial-and-error across HDL object dependencies.</li><li><strong>Measured outcomes:</strong> mock-cycle preparation time reduced materially; repeated error types identified earlier; rerun effort reduced because top defects were grouped before execution.</li><li><strong>What to measure:</strong> load success by object, repeated defect count across cycles, hours spent on reruns, and percentage of data issues prevented before HDL submission.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="example4">
+    <div class="container panel case-study">
+      <div class="case-head">
+        <h3>Example 4 — Labor distribution across Time, Payroll, Projects, Grants, and GL</h3>
+        <p><strong>Scenario:</strong> A public sector or higher education client needs payroll costs distributed by project, grant, fund, or labor schedule. The delivery challenge is coordinating costing logic, exception handling, retro processing, suspense treatment, and reconciliation between payroll and downstream accounting.</p>
+      </div>
+      <div class="case-grid">
+        <div class="subcard"><h4>Detailed design</h4><ul><li>Document source events: time entry, payroll result, labor schedule override, grant eligibility, suspense trigger, and transfer to GL.</li><li>Feed AI the costing rules, distribution hierarchy, suspense rules, retro scenarios, and reconciliation checkpoints.</li><li>Ask AI for a decision table covering valid and exception paths.</li><li>Architect review focuses on financial control points, grants compliance, retro impact, and suspense clearing governance.</li></ul></div>
+        <div class="subcard"><h4>How a developer uses it</h4><p>The developer uses AI to turn meeting notes and functional rules into a structured exception matrix. That matrix is then used to build validation SQL, test scenarios, and reconciliation reports.</p><div class="code">Prompt example
+Create a labor distribution exception table for these conditions:
+- employee has project costing override
+- grant expired during pay period
+- time card approved after payroll close
+- labor schedule missing
+- retro payroll changes prior project allocation
+Output needed:
+1) decision table
+2) expected accounting treatment
+3) suspense rule
+4) validation query ideas
+5) test scenarios</div></div>
+        <div class="subcard"><h4>Working example</h4><div class="code">Example exception decision table excerpt
+
+Condition                          Expected Outcome
+--------------------------------   ---------------------------------------------
+Valid project + active grant       distribute payroll to project/grant lines
+Grant expired mid-period           split eligible and ineligible cost portions
+Missing labor schedule             post to suspense account and flag for review
+Late approved time                 follow defined retro or next-cycle policy
+Retro payroll change               reverse prior distribution and repost delta</div><div class="code" style="margin-top:12px">Example measurable reconciliation controls
+payroll_run_id | payroll_cost | distributed_cost | suspense_cost | unreconciled_amount</div></div>
+        <div class="subcard"><h4>Execution and measured outcome</h4><ul><li>Developer converts the AI-generated decision table into test scripts and exception SQL.</li><li>Finance and grants teams use the same matrix during design review, reducing interpretation gaps.</li><li><strong>Measured outcomes:</strong> design review cycles shorten because exception behavior is visible earlier; test coverage improves for retro and suspense scenarios; reconciliation issues become easier to isolate by condition rather than by ad hoc investigation.</li><li><strong>What to measure:</strong> suspense percentage, retro reprocessing volume, unreconciled payroll-to-GL variance, and average time to resolve distribution exceptions.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="example5">
+    <div class="container panel case-study">
+      <div class="case-head">
+        <h3>Example 5 — BIP, OTBI, and SQL reporting standards</h3>
+        <p><strong>Scenario:</strong> Reporting teams spend time translating business asks into report specs, SQL, parameters, layouts, and validation steps. The technical work is repetitive, but errors in joins, filters, security context, or balance logic create avoidable rework.</p>
+      </div>
+      <div class="case-grid">
+        <div class="subcard"><h4>Detailed design</h4><ul><li>Provide AI the reporting standard: naming convention, parameter format, expected outputs, security rules, and source object list.</li><li>Ask AI for report specification, SQL skeleton, test scenarios, and user acceptance checklist.</li><li>Review focuses on source-of-truth objects, row-level security, parameter behavior, and reconciliation logic.</li><li>Keep separate patterns for OTBI subject-area reporting versus BIP/SQL reporting.</li></ul></div>
+        <div class="subcard"><h4>How a developer uses it</h4><p>The developer pastes a business request, identifies the reporting platform, and asks AI to convert it into a structured technical brief. AI then generates the first-pass SQL skeleton and test cases. The developer validates table joins, index strategy, security filters, and expected totals.</p><div class="code">Example business ask
+"Create a monthly project labor cost report by department, showing payroll cost, distributed cost, suspense amount, and variance. Parameters: payroll period, department, project number."
+
+AI outputs requested
+- technical report spec
+- parameter list and validation rules
+- SQL skeleton
+- reconciliation checks
+- sample UAT scenarios</div></div>
+        <div class="subcard"><h4>Working example</h4><div class="code">Example first-pass deliverables from AI
+
+1. Report spec section:
+   - purpose
+   - source objects
+   - filters
+   - output columns
+   - parameter behavior
+2. SQL skeleton with placeholders for joins and filters
+3. Validation list:
+   - total payroll cost matches payroll source
+   - distributed cost + suspense = payroll cost
+   - project filter excludes inactive projects when required
+4. UAT scenarios:
+   - no data for parameter combination
+   - multiple departments
+   - payroll period with retro adjustments</div></div>
+        <div class="subcard"><h4>Execution and measured outcome</h4><ul><li>Developer uses AI-generated report spec as the first review artifact before writing final SQL or layout logic.</li><li>Functional lead reviews the spec earlier, reducing late-stage rework caused by misunderstood requirements.</li><li><strong>Measured outcomes:</strong> first review happens sooner; missing parameters and edge cases are identified earlier; SQL draft quality improves because the report logic is structured before coding begins.</li><li><strong>What to measure:</strong> number of report revisions after first review, UAT defect count, requirement clarification rounds, and time from request to approved technical spec.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="section-title">
+        <h2>What makes this work in practice</h2>
+        <p>AI produces the most useful Oracle output when the prompt is grounded in the real implementation context: source fields, target objects, validation rules, known edge cases, naming conventions, and expected deliverable format. Teams get weak output when they ask for generic answers to highly specific Oracle delivery problems.</p>
+      </div>
+      <div class="grid-2">
+        <div class="panel card">
+          <h3>Good implementation pattern</h3>
+          <ul>
+            <li>Store reusable context for modules, data objects, naming standards, error codes, and design templates</li>
+            <li>Use AI for bounded artifacts, not final sign-off</li>
+            <li>Review output with leads who understand accounting, payroll, security, or integration controls</li>
+            <li>Track outcomes at the task level, not vague enterprise-wide promises</li>
+          </ul>
+        </div>
+        <div class="panel card">
+          <h3>Useful measured outcomes</h3>
+          <div class="kpi">
+            <div class="tile"><b>Cycle time</b><span>hours to prepare first-pass artifact</span></div>
+            <div class="tile"><b>Defect leakage</b><span>issues discovered after design review</span></div>
+            <div class="tile"><b>Acceptance</b><span>first-pass approval rate</span></div>
+          </div>
+          <div class="kpi" style="margin-top:12px">
+            <div class="tile"><b>Rework</b><span>hours spent revising mappings or SQL</span></div>
+            <div class="tile"><b>Coverage</b><span>edge cases captured in tests</span></div>
+            <div class="tile"><b>Supportability</b><span>clarity of error routing and ownership</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="panel">
+      <h3 style="color:var(--bright);margin-bottom:10px">Bottom line</h3>
+      <p>In Oracle ERP and Cloud programs, AI is most valuable when it is used to generate reviewable delivery artifacts that developers and architects can execute, verify, and measure. The goal is not to automate judgment. The goal is to reduce manual repetition, surface issues earlier, and help teams produce production-ready work with more consistency.</p>
+      <p class="small" style="margin-top:14px">This HTML is optimized for mobile reading, uses a single-file layout, and avoids body-level scroll locking that often causes poor behavior on iPhone.</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
